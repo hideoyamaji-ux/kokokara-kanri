@@ -2,13 +2,28 @@
   "name": "ココカラ解体 現場写真",
   "short_name": "現場写真",
   "description": "現場写真アップロードアプリ",
-  "start_url": "./index.html",
+  "start_url": "./upload_index.html",
   "display": "standalone",
   "background_color": "#F5A623",
   "theme_color": "#F5A623",
   "orientation": "portrait",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "https://kokokara-kaitai.com/wp-content/themes/rd_kaitai2025-2/image/base/hd-logo.png",
+      "sizes": "275x100",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
