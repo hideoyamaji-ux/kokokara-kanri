@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ココカラ解体 現場管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #F5A623;
+  --orange-dark: #D4891A;
+  --orange-light: #FFF8EC;
+  --orange-mid: #FAC05A;
+  --brown: #3D2B1F;
+  --brown-light: #6B4C3B;
+  --white: #FFFFFF;
+  --gray-50: #FAFAFA;
+  --gray-100: #F4F4F5;
+  --gray-200: #E4E4E7;
+  --gray-400: #A1A1AA;
+  --gray-600: #52525B;
+  --gray-700: #3F3F46;
+  --gray-800: #27272A;
+  --green: #16A34A;
+  --green-light: #DCFCE7;
+  --blue: #2563EB;
+  --blue-light: #DBEAFE;
+  --yellow: #CA8A04;
+  --yellow-light: #FEF9C3;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 12px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ===== LAYOUT ===== */
+.app { display: flex; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 240px;
+  background: #FFFFFF;
+  border-right: 1px solid #E4E4E7;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 200;
+  transition: transform 0.3s;
+}
+.sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+.sidebar-logo img {
+    width: 160px;
+    height: auto;
+    display: block;
+  }
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #A1A1AA;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 8px;
+  margin: 16px 0 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: #3F3F46;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  background: #F4F4F5;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 3px;
+}
+.nav-item:hover { background: #E4E4E7; color: #1F2937; }
+.nav-item.active { background: #F5A623; color: white; }
+.nav-item .nav-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.9; }
+.nav-badge {
+  margin-left: auto;
+  background: #D4891A;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+.nav-item.active .nav-badge { background: rgba(0,0,0,0.10); }
+.sidebar-footer {
+  padding: 16px;
+  border-top:  1px solid rgba(0,0,0,0.10);
+}
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: #D4891A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12px; color: #1F2937; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 10px; color: #A1A1AA; }
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.topbar {
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 28px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.page-breadcrumb { font-size: 12px; color: var(--gray-400); }
+.page-heading { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+.topbar-right { display: flex; gap: 8px; align-items: center; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}
+.btn-primary { background: var(--orange); color: white; }
+.btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,166,35,0.35); }
+.btn-ghost { background: transparent; color: var(--gray-600); border: 1px solid var(--gray-200); }
+.btn-ghost:hover { background: var(--gray-100); }
+.btn-danger { background: var(--red); color: white; }
+.btn-danger:hover { background: #B91C1C; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-xs { padding: 3px 8px; font-size: 11px; }
+
+/* ===== CONTENT ===== */
+.content { flex: 1; padding: 24px 28px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ===== STATS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-100);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.stat-card.orange::before { background: var(--orange); }
+.stat-card.blue::before { background: var(--blue); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.brown::before { background: var(--brown); }
+.stat-label {
+  font-size: 11px;
+  color: var(--gray-400);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-value.orange { color: var(--orange); }
+.stat-value.blue { color: var(--blue); }
+.stat-value.green { color: var(--green); }
+.stat-value.brown { color: var(--brown); }
+.stat-sub { font-size: 11px; color: var(--gray-400); }
+
+/* ===== TOOLBAR ===== */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.search-wrap {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+}
+.search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--gray-400);
+}
+.search-input {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  outline: none;
+  background: white;
+  color: var(--gray-800);
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245,166,35,0.12); }
+.filter-select {
+  padding: 9px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  outline: none;
+  background: white;
+  color: var(--gray-700);
+  font-family: inherit;
+  cursor: pointer;
+}
+.filter-select:focus { border-color: var(--orange); }
+
+/* ===== SITE CARDS ===== */
+.sites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+.site-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.site-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+  border-color: var(--orange-mid);
+}
+.card-thumb {
+  height: 160px;
+  background: var(--gray-100);
+  position: relative;
+  overflow: hidden;
+}
+.thumb-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+  gap: 2px;
+}
+.thumb-grid-4 > div { overflow: hidden; background: var(--gray-200); }
+.thumb-grid-4 > div img { width: 100%; height: 100%; object-fit: cover; }
+.thumb-single { width: 100%; height: 100%; object-fit: cover; }
+.thumb-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--gray-400);
+}
+.thumb-empty svg { width: 36px; height: 36px; opacity: 0.5; }
+.thumb-empty span { font-size: 12px; }
+.thumb-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.55);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+.card-body { padding: 14px 16px; }
+.card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.card-title { font-size: 15px; font-weight: 700; color: var(--gray-800); line-height: 1.3; }
+.status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+.s-before { background: var(--yellow-light); color: var(--yellow); }
+.s-inprogress { background: var(--blue-light); color: var(--blue); }
+.s-done { background: var(--green-light); color: var(--green); }
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--gray-600);
+}
+.meta-row svg { width: 12px; height: 12px; color: var(--gray-400); flex-shrink: 0; }
+.card-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--gray-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.photo-count-label {
+  font-size: 12px;
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.photo-count-label svg { width: 13px; height: 13px; }
+.go-arrow { font-size: 12px; color: var(--orange); font-weight: 600; }
+
+/* ===== DETAIL ===== */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--orange);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+.back-btn:hover { opacity: 0.75; }
+.detail-info-card {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.detail-info-header {
+  background: var(--brown);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.detail-site-name { font-size: 20px; font-weight: 700; color: white; margin-bottom: 3px; }
+.detail-site-addr { font-size: 13px; color: rgba(255,255,255,0.6); }
+.detail-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.detail-meta-body { padding: 20px 24px; }
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 20px;
+  margin-bottom: 16px;
+}
+.meta-item { }
+.meta-label { font-size: 10px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+.meta-value { font-size: 13px; color: var(--gray-800); font-weight: 500; }
+.notes-section { border-top: 1px solid var(--gray-100); padding-top: 14px; }
+
+/* ===== UPLOAD ===== */
+.section-card {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.section-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-800);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title svg { width: 16px; height: 16px; color: var(--orange); }
+.section-body { padding: 20px; }
+.drop-zone {
+  border: 2px dashed var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--gray-50);
+  position: relative;
+}
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--orange);
+  background: var(--orange-light);
+}
+.drop-zone input[type=file] { display: none; }
+.drop-icon {
+  width: 48px; height: 48px;
+  background: var(--orange-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+.drop-icon svg { width: 22px; height: 22px; color: var(--orange); }
+.drop-text { font-size: 13px; color: var(--gray-500); }
+.drop-text strong { color: var(--orange); }
+.drop-sub { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+.preview-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.preview-item {
+  aspect-ratio: 1;
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  position: relative;
+  background: var(--gray-100);
+}
+.preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.preview-remove {
+  position: absolute; top: 3px; right: 3px;
+  width: 18px; height: 18px;
+  background: rgba(0,0,0,0.55);
+  border: none; border-radius: 50%;
+  color: white; font-size: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.upload-row {
+  display: flex; gap: 8px; margin-top: 14px;
+}
+.comment-input {
+  flex: 1;
+  padding: 9px 13px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  color: var(--gray-800);
+}
+.comment-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245,166,35,0.12); }
+.progress-wrap { margin-top: 10px; display: none; }
+.progress-label { font-size: 12px; color: var(--gray-400); margin-bottom: 4px; }
+.progress-bar { height: 4px; background: var(--gray-200); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--orange); border-radius: 2px; width: 0; transition: width 0.3s; }
+
+/* ===== PHOTO GRID ===== */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 10px;
+}
+.photo-item {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  background: var(--gray-100);
+  transition: transform 0.15s;
+}
+.photo-item:hover { transform: scale(1.025); }
+.photo-item img { width: 100%; height: 100%; object-fit: cover; }
+.photo-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.65));
+  padding: 18px 8px 7px;
+}
+.photo-date { font-size: 10px; color: rgba(255,255,255,0.8); }
+.photo-comment { font-size: 11px; color: white; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.photo-del {
+  position: absolute; top: 4px; right: 4px;
+  width: 22px; height: 22px;
+  background: rgba(220,38,38,0.8);
+  border: none; border-radius: 50%;
+  color: white; font-size: 11px;
+  cursor: pointer; display: none;
+  align-items: center; justify-content: center;
+}
+.photo-item:hover .photo-del { display: flex; }
+
+/* ===== VENDORS TABLE ===== */
+.data-table-wrap {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  background: var(--gray-50);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--gray-200);
+  text-align: left;
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gray-50);
+  font-size: 13px;
+  color: var(--gray-700);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background: var(--gray-50); }
+.vendor-name-cell { display: flex; align-items: center; gap: 10px; }
+.vendor-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--orange-light);
+  color: var(--orange-dark);
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.line-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #06C755;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.qr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--brown);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  animation: modalIn 0.2s ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal-head {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky; top: 0; background: white; z-index: 1;
+}
+.modal-title { font-size: 16px; font-weight: 700; color: var(--gray-800); }
+.modal-close {
+  width: 30px; height: 30px;
+  background: var(--gray-100);
+  border: none; border-radius: 50%;
+  cursor: pointer; font-size: 14px;
+  color: var(--gray-600);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-body { padding: 20px 24px; }
+.modal-foot {
+  padding: 16px 24px;
+  border-top: 1px solid var(--gray-100);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  position: sticky; bottom: 0; background: white;
+}
+.form-group { margin-bottom: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  display: block;
+}
+.form-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  outline: none;
+  color: var(--gray-800);
+  font-family: inherit;
+  transition: border-color 0.15s;
+  background: white;
+}
+.form-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245,166,35,0.12); }
+textarea.form-input { resize: vertical; }
+
+/* ===== VIEWER ===== */
+.viewer-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.93);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.viewer-overlay.open { display: flex; }
+.viewer-close {
+  position: fixed; top: 18px; right: 18px;
+  background: rgba(255,255,255,0.12);
+  border: none; border-radius: 50%;
+  color: white; width: 38px; height: 38px;
+  font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.viewer-wrap {
+  position: relative;
+  max-width: 880px;
+  width: 100%;
+  padding: 0 60px;
+  text-align: center;
+}
+.viewer-img {
+  max-height: 68vh;
+  max-width: 100%;
+  border-radius: var(--radius);
+  object-fit: contain;
+}
+.viewer-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.13);
+  border: none; color: white;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.viewer-nav:hover { background: rgba(255,255,255,0.25); }
+.viewer-nav.prev { left: 4px; }
+.viewer-nav.next { right: 4px; }
+.viewer-info { color: white; margin-top: 16px; padding: 0 60px; }
+.viewer-comment { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.viewer-meta { font-size: 12px; color: rgba(255,255,255,0.55); display: flex; gap: 20px; justify-content: center; }
+
+/* ===== STATUS MODAL ===== */
+.status-opts { display: grid; gap: 8px; }
+.status-opt {
+  padding: 13px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px; font-weight: 600;
+  transition: all 0.15s;
+  text-align: left; background: white;
+  font-family: inherit; display: flex; align-items: center; gap: 10px;
+}
+.status-opt:hover { border-color: var(--orange); background: var(--orange-light); color: var(--orange-dark); }
+
+/* ===== QR MODAL ===== */
+.qr-wrap {
+  text-align: center; padding: 10px 0;
+}
+.qr-img { width: 200px; height: 200px; margin: 0 auto 12px; display: block; }
+.qr-url { font-size: 11px; color: var(--gray-400); word-break: break-all; margin-bottom: 14px; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--gray-800);
+  color: white;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 13px; font-weight: 500;
+  z-index: 3000;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+}
+.toast.show { opacity: 1; }
+.toast.ok { background: var(--green); }
+.toast.err { background: var(--red); }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray-400);
+}
+.empty-state svg { width: 52px; height: 52px; margin-bottom: 12px; opacity: 0.3; }
+.empty-state p { font-size: 14px; }
+
+/* ===== COMPLETED TABLE ===== */
+.completed-link { color: var(--orange); font-weight: 600; cursor: pointer; text-decoration: none; }
+.completed-link:hover { text-decoration: underline; }
+
+/* ===== SETTINGS ===== */
+.settings-card {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+.settings-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.info-box {
+  background: var(--orange-light);
+  border: 1px solid var(--orange-mid);
+  border-radius: var(--radius-xs);
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--brown-light);
+  line-height: 1.8;
+  margin: 12px 0;
+}
+
+/* ===== MOBILE ===== */
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--gray-800);
+}
+.sidebar-overlay { display: none; }
+
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay {
+    display: block;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 199;
+    display: none;
+  }
+  .sidebar-overlay.show { display: block; }
+  .main { margin-left: 0; }
+  .menu-btn { display: flex; align-items: center; }
+  .content { padding: 16px; }
+  .sites-grid { grid-template-columns: 1fr; }
+  .photo-grid { grid-template-columns: repeat(3, 1fr); }
+  .form-row { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .topbar { padding: 0 16px; }
+}
+@media (max-width: 480px) {
+  .photo-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="https://kokokara-kaitai.com/wp-content/themes/rd_kaitai2025-2/image/base/hd-logo.png" alt="ココカラ解体">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">メニュー</div>
+    <button class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      現場一覧
+      <span class="nav-badge" id="nav-badge-sites">0</span>
+    </button>
+    <button class="nav-item" onclick="showPage('vendors')" id="nav-vendors">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      業者管理
+    </button>
+    <button class="nav-item" onclick="showPage('completed')" id="nav-completed">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      完了現場
+    </button>
+    <div class="nav-section-label">システム</div>
+    <button class="nav-item" onclick="showPage('settings')" id="nav-settings">
+      <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      設定
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">管</div>
+      <div class="user-info">
+        <div class="user-name">管理者</div>
+        <div class="user-role">社内スタッフ</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" onclick="toggleSidebar()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div>
+        <div class="page-breadcrumb" id="topbar-breadcrumb">ダッシュボード</div>
+        <div class="page-heading" id="topbar-heading">現場一覧</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="openVendorModal()">業者登録</button>
+      <button class="btn btn-primary" onclick="openSiteModal()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        現場登録
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid">
+        <div class="stat-card orange">
+          <div class="stat-label">稼働中現場</div>
+          <div class="stat-value orange" id="st-active">0</div>
+          <div class="stat-sub">工事前＋工事中</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">工事中</div>
+          <div class="stat-value blue" id="st-inprog">0</div>
+          <div class="stat-sub">現在進行中</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">総写真数</div>
+          <div class="stat-value green" id="st-photos">0</div>
+          <div class="stat-sub">アップロード済み</div>
+        </div>
+        <div class="stat-card brown">
+          <div class="stat-label">登録業者数</div>
+          <div class="stat-value brown" id="st-vendors">0</div>
+          <div class="stat-sub">アクティブ</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="search-q" placeholder="現場名・住所・業者名で検索..." oninput="filterSites()">
+        </div>
+        <select class="filter-select" id="filter-status" onchange="filterSites()">
+          <option value="">全ステータス</option>
+          <option value="工事前">工事前</option>
+          <option value="工事中">工事中</option>
+        </select>
+        <select class="filter-select" id="filter-vendor" onchange="filterSites()">
+          <option value="">全業者</option>
+        </select>
+      </div>
+      <div class="sites-grid" id="sites-grid"></div>
+    </div>
+
+    <!-- ===== DETAIL ===== -->
+    <div id="page-detail" class="page">
+      <button class="back-btn" onclick="showPage('dashboard')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        現場一覧に戻る
+      </button>
+      <div class="detail-info-card">
+        <div class="detail-info-header">
+          <div>
+            <div class="detail-site-name" id="d-name">-</div>
+            <div class="detail-site-addr" id="d-addr">-</div>
+          </div>
+          <div class="detail-header-actions">
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.2)" onclick="openStatusModal()">ステータス変更</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.2)" onclick="editSite()">編集</button>
+          </div>
+        </div>
+        <div class="detail-meta-body">
+          <div class="detail-grid">
+            <div class="meta-item"><div class="meta-label">施工業者</div><div class="meta-value" id="d-vendor">-</div></div>
+            <div class="meta-item"><div class="meta-label">担当者</div><div class="meta-value" id="d-contact">-</div></div>
+            <div class="meta-item"><div class="meta-label">担当者携帯</div><div class="meta-value" id="d-phone">-</div></div>
+            <div class="meta-item"><div class="meta-label">工期</div><div class="meta-value" id="d-period">-</div></div>
+            <div class="meta-item"><div class="meta-label">LINE ID</div><div class="meta-value" id="d-line">-</div></div>
+            <div class="meta-item"><div class="meta-label">ステータス</div><div class="meta-value" id="d-status">-</div></div>
+          </div>
+          <div class="notes-section">
+            <div class="meta-label">特記事項</div>
+            <div class="meta-value" id="d-notes" style="margin-top:3px; white-space:pre-line; color:var(--gray-600)">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPLOAD -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            写真アップロード
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" multiple accept="image/*" onchange="handleFiles(this.files)">
+            <div class="drop-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+            <p class="drop-text"><strong>クリックまたはドラッグ</strong>して写真を選択</p>
+            <p class="drop-sub">複数選択可・JPG・PNG・HEIC対応・自動圧縮</p>
+          </div>
+          <div class="preview-row" id="preview-row"></div>
+          <div class="upload-row">
+            <input type="text" class="comment-input" id="upload-comment" placeholder="コメントを入力（例：1階解体前の状況）">
+            <button class="btn btn-primary" onclick="doUpload()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              アップロード
+            </button>
+          </div>
+          <div class="progress-wrap" id="progress-wrap">
+            <div class="progress-label" id="progress-label">アップロード中...</div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHOTOS -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            現場写真 <span style="font-size:12px;color:var(--gray-400);font-weight:400" id="d-photo-count"></span>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="photo-grid" id="photo-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== VENDORS ===== -->
+    <div id="page-vendors" class="page">
+      <div class="toolbar" style="margin-bottom:16px">
+        <div class="search-wrap">
+          <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="vendor-search" placeholder="業者名・代表者名で検索..." oninput="renderVendors()">
+        </div>
+        <button class="btn btn-primary" onclick="openVendorModal()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          業者登録
+        </button>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>業者名</th><th>代表者名</th><th>会社電話</th><th>代表者携帯</th><th>住所</th><th>操作</th>
+          </tr></thead>
+          <tbody id="vendor-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== COMPLETED ===== -->
+    <div id="page-completed" class="page">
+      <div class="toolbar" style="margin-bottom:16px">
+        <div class="search-wrap">
+          <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="completed-search" placeholder="現場名・住所・業者名で検索..." oninput="renderCompleted()">
+        </div>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>現場名</th><th>住所</th><th>業者名</th><th>工期</th><th>写真数</th><th>完了日</th><th></th>
+          </tr></thead>
+          <tbody id="completed-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div id="page-settings" class="page">
+      <div class="settings-card">
+        <div class="settings-section-title">🔌 Google Apps Script 連携設定</div>
+        <div class="form-group">
+          <label class="form-label">GAS WebApp URL</label>
+          <input type="text" class="form-input" id="cfg-gas-url" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <div class="form-group">
+          <label class="form-label">スプレッドシートID（確認用）</label>
+          <input type="text" class="form-input" id="cfg-ss-id" placeholder="スプレッドシートのID">
+        </div>
+        <div class="info-box">
+          📋 セットアップ手順<br>
+          1. gas_setup.js をApps Scriptに貼り付けて「setupAll」を実行<br>
+          2. gas_api.js を別プロジェクトに貼り付けてデプロイ<br>
+          3. デプロイで発行されたURLを上に入力して保存
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">設定を保存</button>
+      </div>
+      <div class="settings-card">
+        <div class="settings-section-title">🌐 業者アップロード画面URL</div>
+        <div class="form-group">
+          <label class="form-label">アップロード画面のURL</label>
+          <input type="text" class="form-input" id="cfg-upload-url" placeholder="https://upload.your-domain.co.jp">
+        </div>
+        <p style="font-size:12px;color:var(--gray-400);margin-top:6px">業者向けQRコードはこのURLに業者トークンを付加して生成されます</p>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="saveSettings()">保存</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- SITE MODAL -->
+<div class="modal-overlay" id="site-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <div class="modal-title" id="site-modal-title">現場登録</div>
+      <button class="modal-close" onclick="closeModal('site-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-site-id">
+      <div class="form-group">
+        <label class="form-label">現場名（施主名）*</label>
+        <input type="text" class="form-input" id="f-name" placeholder="例：田中邸解体工事">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">施主電話番号</label>
+          <input type="tel" class="form-input" id="f-client-phone" placeholder="090-0000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ステータス</label>
+          <select class="form-input" id="f-status">
+            <option value="工事前">工事前</option>
+            <option value="工事中">工事中</option>
+            <option value="工事完了">工事完了</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">現場住所</label>
+        <input type="text" class="form-input" id="f-address" placeholder="例：徳島県徳島市○○町1-1">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">工期（開始）</label>
+          <input type="date" class="form-input" id="f-start">
+        </div>
+        <div class="form-group">
+          <label class="form-label">工期（終了）</label>
+          <input type="date" class="form-input" id="f-end">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">施工業者</label>
+          <select class="form-input" id="f-vendor-id"><option value="">選択してください</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">現場担当者名</label>
+          <input type="text" class="form-input" id="f-contact" placeholder="例：山田 太郎">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">担当者携帯</label>
+          <input type="tel" class="form-input" id="f-contact-phone" placeholder="090-0000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">LINE ID</label>
+          <input type="text" class="form-input" id="f-line" placeholder="例：yamada_taro">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">特記事項</label>
+        <textarea class="form-input" id="f-notes" rows="3" placeholder="特記事項・注意事項など"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('site-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveSite()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- VENDOR MODAL -->
+<div class="modal-overlay" id="vendor-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div class="modal-title" id="vendor-modal-title">業者登録</div>
+      <button class="modal-close" onclick="closeModal('vendor-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="v-id">
+      <div class="form-group">
+        <label class="form-label">業者名*</label>
+        <input type="text" class="form-input" id="v-name" placeholder="例：山田建設株式会社">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">代表者名</label>
+          <input type="text" class="form-input" id="v-rep" placeholder="例：山田 太郎">
+        </div>
+        <div class="form-group">
+          <label class="form-label">会社電話番号</label>
+          <input type="tel" class="form-input" id="v-phone" placeholder="088-000-0000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">代表者携帯</label>
+          <input type="tel" class="form-input" id="v-mobile" placeholder="090-0000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">住所</label>
+          <input type="text" class="form-input" id="v-addr" placeholder="例：徳島県徳島市○○2-2">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('vendor-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveVendor()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS MODAL -->
+<div class="modal-overlay" id="status-modal">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <div class="modal-title">ステータス変更</div>
+      <button class="modal-close" onclick="closeModal('status-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="status-opts">
+        <button class="status-opt" onclick="setStatus('工事前')">🏗️ &nbsp;工事前</button>
+        <button class="status-opt" onclick="setStatus('工事中')">⚙️ &nbsp;工事中（進行中）</button>
+        <button class="status-opt" onclick="setStatus('工事完了')" style="color:var(--red)">✅ &nbsp;工事完了（一覧から非表示）</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="modal-overlay" id="qr-modal">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head">
+      <div class="modal-title" id="qr-modal-title">QRコード</div>
+      <button class="modal-close" onclick="closeModal('qr-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="qr-wrap">
+        <canvas id="qr-canvas" class="qr-img"></canvas>
+        <div class="qr-url" id="qr-url-text"></div>
+        <p style="font-size:12px;color:var(--gray-400);margin-bottom:12px">このQRコードを業者にLINEで送付してください</p>
+        <button class="btn btn-primary" style="width:100%" onclick="downloadQR()">QRコードをダウンロード</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEWER -->
+<div class="viewer-overlay" id="viewer">
+  <button class="viewer-close" onclick="closeViewer()">✕</button>
+  <div class="viewer-wrap">
+    <button class="viewer-nav prev" onclick="viewerMove(-1)">‹</button>
+    <img class="viewer-img" id="viewer-img" src="" alt="">
+    <button class="viewer-nav next" onclick="viewerMove(1)">›</button>
+  </div>
+  <div class="viewer-info">
+    <div class="viewer-comment" id="viewer-comment"></div>
+    <div class="viewer-meta">
+      <span id="viewer-date"></span>
+      <span id="viewer-vendor"></span>
+      <span id="viewer-idx"></span>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- QR Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+// ==============================
+// DATA STORE
+// ==============================
+let DB = {
+  sites: JSON.parse(localStorage.getItem('kk_sites') || '[]'),
+  vendors: JSON.parse(localStorage.getItem('kk_vendors') || '[]'),
+  photos: JSON.parse(localStorage.getItem('kk_photos') || '[]'),
+  gasUrl: localStorage.getItem('kk_gas_url') || '',
+  uploadUrl: localStorage.getItem('kk_upload_url') || '',
+};
+
+let currentSiteId = null;
+let pendingFiles = [];
+let viewerList = [];
+let viewerIdx = 0;
+let editingVendorId = null;
+let editingSiteId = null;
+
+function saveDB() {
+  localStorage.setItem('kk_sites', JSON.stringify(DB.sites));
+  localStorage.setItem('kk_vendors', JSON.stringify(DB.vendors));
+  localStorage.setItem('kk_photos', JSON.stringify(DB.photos));
+}
+
+function genId(prefix) {
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+}
+
+// ==============================
+// DEMO DATA
+// ==============================
+if (DB.vendors.length === 0) {
+  DB.vendors = [
+    { id:'VND_001', name:'山田建設株式会社', rep:'山田 太郎', phone:'088-623-0001', mobile:'090-1111-2222', addr:'徳島県徳島市南末広町5-1', token:'demo_token_yamada', active:true },
+    { id:'VND_002', name:'田中工業', rep:'田中 次郎', phone:'088-652-0002', mobile:'090-3333-4444', addr:'徳島県鳴門市撫養町大桑島88', token:'demo_token_tanaka', active:true },
+    { id:'VND_003', name:'鈴木解体工事', rep:'鈴木 三郎', phone:'088-678-0003', mobile:'090-5555-6666', addr:'徳島県阿南市富岡町19', token:'demo_token_suzuki', active:true },
+  ];
+  DB.sites = [
+    { id:'SITE_001', name:'中村邸解体工事', address:'徳島県徳島市南沖洲1-3-5', clientPhone:'090-7777-8888', status:'工事中', startDate:'2026-04-01', endDate:'2026-04-30', vendorId:'VND_001', vendorName:'山田建設株式会社', contactName:'山田 一郎', contactPhone:'090-1111-2222', lineId:'yamada_ichi', notes:'近隣への騒音注意。週3日稼働。', folderId:'' },
+    { id:'SITE_002', name:'佐藤ビル解体', address:'徳島県鳴門市鳴門町土佐泊浦65', clientPhone:'088-685-0001', status:'工事前', startDate:'2026-05-01', endDate:'2026-06-15', vendorId:'VND_002', vendorName:'田中工業', contactName:'田中 次郎', contactPhone:'090-3333-4444', lineId:'tanaka_jiro', notes:'アスベスト事前調査済み。', folderId:'' },
+    { id:'SITE_003', name:'阿部倉庫解体', address:'徳島県阿南市富岡町トノ町2', clientPhone:'090-2222-3333', status:'工事中', startDate:'2026-03-15', endDate:'2026-04-20', vendorId:'VND_003', vendorName:'鈴木解体工事', contactName:'鈴木 三郎', contactPhone:'090-5555-6666', lineId:'suzuki_san', notes:'', folderId:'' },
+    { id:'SITE_004', name:'木村旧工場解体', address:'徳島県徳島市川内町平石153', clientPhone:'090-4444-5555', status:'工事完了', startDate:'2026-01-10', endDate:'2026-03-01', vendorId:'VND_001', vendorName:'山田建設株式会社', contactName:'山田 太郎', contactPhone:'090-1111-2222', lineId:'yamada_taro', notes:'', folderId:'' },
+  ];
+  DB.photos = [
+    { id:'PHT_001', siteId:'SITE_001', comment:'1階解体前（正面）', captureDate:'2026-04-10', uploadDate:'2026-04-10', vendorName:'山田建設株式会社', url:'_demo_orange' },
+    { id:'PHT_002', siteId:'SITE_001', comment:'内部状況確認', captureDate:'2026-04-11', uploadDate:'2026-04-11', vendorName:'山田建設株式会社', url:'_demo_sand' },
+    { id:'PHT_003', siteId:'SITE_001', comment:'2階解体開始', captureDate:'2026-04-12', uploadDate:'2026-04-12', vendorName:'山田建設株式会社', url:'_demo_blue' },
+    { id:'PHT_004', siteId:'SITE_001', comment:'廃材搬出', captureDate:'2026-04-13', uploadDate:'2026-04-13', vendorName:'山田建設株式会社', url:'_demo_green' },
+    { id:'PHT_005', siteId:'SITE_003', comment:'倉庫外観', captureDate:'2026-04-05', uploadDate:'2026-04-05', vendorName:'鈴木解体工事', url:'_demo_gray' },
+    { id:'PHT_006', siteId:'SITE_003', comment:'屋根解体中', captureDate:'2026-04-08', uploadDate:'2026-04-08', vendorName:'鈴木解体工事', url:'_demo_brown' },
+  ];
+  saveDB();
+}
+
+// ==============================
+// DEMO IMAGE COLORS
+// ==============================
+const DEMO_COLORS = {
+  '_demo_orange': '#FED7AA',
+  '_demo_sand':   '#E7D5BB',
+  '_demo_blue':   '#BFDBFE',
+  '_demo_green':  '#BBF7D0',
+  '_demo_gray':   '#D1D5DB',
+  '_demo_brown':  '#D6D3D1',
+};
+
+function makeThumb(url, w, h) {
+  if (!url || !url.startsWith('_demo_')) {
+    return `<img src="${url}" style="width:100%;height:100%;object-fit:cover" loading="lazy">`;
+  }
+  const c = DEMO_COLORS[url] || '#E5E7EB';
+  return `<div style="width:100%;height:100%;background:${c};display:flex;align-items:center;justify-content:center"><svg width="24" height="24" fill="none" stroke="#9CA3AF" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+}
+
+// ==============================
+// PAGE ROUTING
+// ==============================
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const navEl = document.getElementById('nav-' + (page === 'detail' ? 'dashboard' : page));
+  if (navEl) navEl.classList.add('active');
+
+  const titles = { dashboard:'現場一覧', detail:'現場詳細', vendors:'業者管理', completed:'完了現場一覧', settings:'設定' };
+  document.getElementById('topbar-heading').textContent = titles[page] || '';
+  document.getElementById('topbar-breadcrumb').textContent = 'ダッシュボード' + (page !== 'dashboard' ? ' / ' + titles[page] : '');
+
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'vendors') renderVendors();
+  if (page === 'completed') renderCompleted();
+  if (page === 'settings') loadSettings();
+  closeSidebar();
+}
+
+// ==============================
+// DASHBOARD
+// ==============================
+function renderDashboard() {
+  const active = DB.sites.filter(s => s.status !== '工事完了');
+  const inprog = DB.sites.filter(s => s.status === '工事中');
+  document.getElementById('st-active').textContent = active.length;
+  document.getElementById('st-inprog').textContent = inprog.length;
+  document.getElementById('st-photos').textContent = DB.photos.length;
+  document.getElementById('st-vendors').textContent = DB.vendors.filter(v => v.active).length;
+  document.getElementById('nav-badge-sites').textContent = active.length;
+
+  const vf = document.getElementById('filter-vendor');
+  vf.innerHTML = '<option value="">全業者</option>';
+  DB.vendors.forEach(v => { vf.innerHTML += `<option value="${v.id}">${v.name}</option>`; });
+
+  filterSites();
+}
+
+function filterSites() {
+  const q = (document.getElementById('search-q').value || '').toLowerCase();
+  const sf = document.getElementById('filter-status').value;
+  const vf = document.getElementById('filter-vendor').value;
+  const list = DB.sites.filter(s => {
+    if (s.status === '工事完了') return false;
+    if (sf && s.status !== sf) return false;
+    if (vf && s.vendorId !== vf) return false;
+    if (q && !s.name.toLowerCase().includes(q) && !s.address.toLowerCase().includes(q) && !s.vendorName.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderSiteCards(list);
+}
+
+function renderSiteCards(list) {
+  const grid = document.getElementById('sites-grid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><p>現場が見つかりません</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(s => {
+    const sp = DB.photos.filter(p => p.siteId === s.id);
+    const bc = s.status === '工事中' ? 's-inprogress' : (s.status === '工事完了' ? 's-done' : 's-before');
+    const period = [s.startDate, s.endDate].filter(Boolean).join(' ～ ').replace(/-/g, '/') || '工期未設定';
+    let thumbHtml = '';
+    if (!sp.length) {
+      thumbHtml = `<div class="thumb-empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>写真なし</span></div>`;
+    } else if (sp.length === 1) {
+      thumbHtml = makeThumb(sp[0].url, '100%', '100%');
+    } else {
+      thumbHtml = `<div class="thumb-grid-4">${sp.slice(0,4).map(p => `<div>${makeThumb(p.url)}</div>`).join('')}</div>`;
+    }
+    return `<div class="site-card" onclick="openDetail('${s.id}')">
+      <div class="card-thumb">${thumbHtml}<span class="thumb-badge">📷 ${sp.length}</span></div>
+      <div class="card-body">
+        <div class="card-title-row">
+          <div class="card-title">${s.name}</div>
+          <span class="status-badge ${bc}">${s.status}</span>
+        </div>
+        <div class="card-meta">
+          <div class="meta-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${s.address || '住所未設定'}</div>
+          <div class="meta-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${s.vendorName || '業者未設定'}</div>
+          <div class="meta-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${period}</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="photo-count-label"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>${sp.length}枚の写真</span>
+        <span class="go-arrow">詳細 →</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ==============================
+// DETAIL
+// ==============================
+function openDetail(siteId) {
+  currentSiteId = siteId;
+  const s = DB.sites.find(x => x.id === siteId);
+  if (!s) return;
+  document.getElementById('d-name').textContent = s.name;
+  document.getElementById('d-addr').textContent = s.address || '住所未設定';
+  document.getElementById('d-vendor').textContent = s.vendorName || '未設定';
+  document.getElementById('d-contact').textContent = s.contactName || '-';
+  document.getElementById('d-phone').textContent = s.contactPhone || '-';
+  document.getElementById('d-period').textContent = [s.startDate, s.endDate].filter(Boolean).join(' ～ ').replace(/-/g,'/')||'未設定';
+  document.getElementById('d-line').innerHTML = s.lineId ? `<a href="https://line.me/ti/p/~${s.lineId}" style="color:var(--blue)" target="_blank">${s.lineId}</a>` : '-';
+  const bc = s.status==='工事中'?'s-inprogress':(s.status==='工事完了'?'s-done':'s-before');
+  document.getElementById('d-status').innerHTML = `<span class="status-badge ${bc}">${s.status}</span>`;
+  document.getElementById('d-notes').textContent = s.notes || '（特記事項なし）';
+  renderPhotos(siteId);
+  showPage('detail');
+}
+
+function renderPhotos(siteId) {
+  const sp = DB.photos.filter(p => p.siteId === siteId).sort((a,b) => b.uploadDate.localeCompare(a.uploadDate));
+  viewerList = sp;
+  document.getElementById('d-photo-count').textContent = `（${sp.length}枚）`;
+  const grid = document.getElementById('photo-grid');
+  if (!sp.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:40px"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><p>写真をアップロードしてください</p></div>';
+    return;
+  }
+  grid.innerHTML = sp.map((p,i) => `
+    <div class="photo-item" onclick="openViewer(${i})">
+      ${makeThumb(p.url)}
+      <div class="photo-overlay">
+        <div class="photo-date">${p.captureDate.replace(/-/g,'/')}</div>
+        ${p.comment ? `<div class="photo-comment">${p.comment}</div>` : ''}
+      </div>
+      <button class="photo-del" onclick="event.stopPropagation();delPhoto('${p.id}')">✕</button>
+    </div>`).join('');
+}
+
+function delPhoto(photoId) {
+  if (!confirm('この写真を削除しますか？')) return;
+  DB.photos = DB.photos.filter(p => p.id !== photoId);
+  saveDB();
+  renderPhotos(currentSiteId);
+  showToast('写真を削除しました');
+}
+
+// ==============================
+// UPLOAD
+// ==============================
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleFiles(e.dataTransfer.files); });
+
+function handleFiles(files) {
+  pendingFiles = [...pendingFiles, ...Array.from(files)];
+  renderPreviews();
+}
+
+function renderPreviews() {
+  const row = document.getElementById('preview-row');
+  row.innerHTML = '';
+  pendingFiles.forEach((f,i) => {
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+    const reader = new FileReader();
+    reader.onload = e => { div.innerHTML = `<img src="${e.target.result}"><button class="preview-remove" onclick="removePrev(${i})">✕</button>`; };
+    reader.readAsDataURL(f);
+    row.appendChild(div);
+  });
+}
+
+function removePrev(i) {
+  pendingFiles.splice(i, 1);
+  renderPreviews();
+}
+
+async function compressImage(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 1920;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.82);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function doUpload() {
+  if (!pendingFiles.length) { showToast('写真を選択してください', 'err'); return; }
+  if (!currentSiteId) return;
+  const s = DB.sites.find(x => x.id === currentSiteId);
+  const comment = document.getElementById('upload-comment').value;
+  const pw = document.getElementById('progress-wrap');
+  const pf = document.getElementById('progress-fill');
+  const pl = document.getElementById('progress-label');
+  pw.style.display = 'block';
+  const gasUrl = DB.gasUrl;
+  const today = new Date().toISOString().slice(0,10);
+
+  for (let i = 0; i < pendingFiles.length; i++) {
+    pl.textContent = `圧縮・アップロード中... ${i+1}/${pendingFiles.length}`;
+    pf.style.width = (i / pendingFiles.length * 100) + '%';
+    const compressed = await compressImage(pendingFiles[i]);
+    let url = '';
+    if (gasUrl) {
+      try {
+        const b64 = await new Promise(res => {
+          const r = new FileReader();
+          r.onload = e => res(e.target.result.split(',')[1]);
+          r.readAsDataURL(compressed);
+        });
+        const resp = await fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action:'uploadPhoto', siteId:currentSiteId, siteName:s.name, fileName:pendingFiles[i].name, fileData:b64, comment, vendorName:'社内', captureDate:today })
+        });
+        const d = await resp.json();
+        url = d.url || '';
+      } catch(e) { console.warn('GAS upload failed', e); }
+    }
+    if (!url) {
+      url = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(compressed); });
+    }
+    DB.photos.push({ id:genId('PHT'), siteId:currentSiteId, comment, captureDate:today, uploadDate:today, vendorName:s.vendorName||'', url });
+  }
+
+  saveDB();
+  pf.style.width = '100%';
+  pl.textContent = `${pendingFiles.length}枚のアップロード完了！`;
+  setTimeout(() => { pw.style.display = 'none'; pf.style.width = '0'; }, 2000);
+  document.getElementById('upload-comment').value = '';
+  pendingFiles = [];
+  document.getElementById('preview-row').innerHTML = '';
+  document.getElementById('file-input').value = '';
+  renderPhotos(currentSiteId);
+  renderDashboard();
+  showToast(`${DB.photos.filter(p=>p.siteId===currentSiteId).length}枚の写真が保存されました`, 'ok');
+}
+
+// ==============================
+// VIEWER
+// ==============================
+function openViewer(idx) { viewerIdx = idx; renderViewer(); document.getElementById('viewer').classList.add('open'); }
+function closeViewer() { document.getElementById('viewer').classList.remove('open'); }
+function viewerMove(d) { viewerIdx = (viewerIdx + d + viewerList.length) % viewerList.length; renderViewer(); }
+function renderViewer() {
+  const p = viewerList[viewerIdx];
+  if (!p) return;
+  const img = document.getElementById('viewer-img');
+  if (p.url.startsWith('_demo_')) {
+    img.src = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="${DEMO_COLORS[p.url]||'#eee'}"/><text x="200" y="155" text-anchor="middle" font-size="14" fill="#9CA3AF">サンプル写真</text></svg>`);
+  } else { img.src = p.url; }
+  document.getElementById('viewer-comment').textContent = p.comment || '（コメントなし）';
+  document.getElementById('viewer-date').textContent = '撮影日: ' + (p.captureDate||'').replace(/-/g,'/');
+  document.getElementById('viewer-vendor').textContent = p.vendorName || '';
+  document.getElementById('viewer-idx').textContent = `${viewerIdx+1} / ${viewerList.length}`;
+}
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('viewer').classList.contains('open')) return;
+  if (e.key === 'ArrowLeft') viewerMove(-1);
+  if (e.key === 'ArrowRight') viewerMove(1);
+  if (e.key === 'Escape') closeViewer();
+});
+
+// ==============================
+// SITE MODAL
+// ==============================
+function openSiteModal(siteId) {
+  editingSiteId = siteId || null;
+  document.getElementById('site-modal-title').textContent = siteId ? '現場編集' : '現場登録';
+  const fi = document.getElementById('f-vendor-id');
+  fi.innerHTML = '<option value="">業者を選択</option>';
+  DB.vendors.forEach(v => { fi.innerHTML += `<option value="${v.id}">${v.name}</option>`; });
+
+  if (siteId) {
+    const s = DB.sites.find(x => x.id === siteId);
+    document.getElementById('f-site-id').value = s.id;
+    document.getElementById('f-name').value = s.name;
+    document.getElementById('f-client-phone').value = s.clientPhone||'';
+    document.getElementById('f-status').value = s.status;
+    document.getElementById('f-address').value = s.address||'';
+    document.getElementById('f-start').value = s.startDate||'';
+    document.getElementById('f-end').value = s.endDate||'';
+    document.getElementById('f-vendor-id').value = s.vendorId||'';
+    document.getElementById('f-contact').value = s.contactName||'';
+    document.getElementById('f-contact-phone').value = s.contactPhone||'';
+    document.getElementById('f-line').value = s.lineId||'';
+    document.getElementById('f-notes').value = s.notes||'';
+  } else {
+    ['f-site-id','f-name','f-client-phone','f-address','f-contact','f-contact-phone','f-line','f-notes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-status').value = '工事前';
+    document.getElementById('f-start').value = '';
+    document.getElementById('f-end').value = '';
+  }
+  openModal('site-modal');
+}
+
+function saveSite() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { showToast('現場名を入力してください', 'err'); return; }
+  const vid = document.getElementById('f-vendor-id').value;
+  const vendor = DB.vendors.find(v => v.id === vid);
+  const data = {
+    name,
+    clientPhone: document.getElementById('f-client-phone').value,
+    status: document.getElementById('f-status').value,
+    address: document.getElementById('f-address').value,
+    startDate: document.getElementById('f-start').value,
+    endDate: document.getElementById('f-end').value,
+    vendorId: vid,
+    vendorName: vendor ? vendor.name : '',
+    contactName: document.getElementById('f-contact').value,
+    contactPhone: document.getElementById('f-contact-phone').value,
+    lineId: document.getElementById('f-line').value,
+    notes: document.getElementById('f-notes').value,
+    folderId: '',
+  };
+  if (editingSiteId) {
+    const idx = DB.sites.findIndex(s => s.id === editingSiteId);
+    if (idx >= 0) DB.sites[idx] = { ...DB.sites[idx], ...data };
+    showToast('現場情報を更新しました', 'ok');
+  } else {
+    DB.sites.push({ id: genId('SITE'), ...data });
+    showToast('現場を登録しました', 'ok');
+  }
+  saveDB();
+  closeModal('site-modal');
+  renderDashboard();
+}
+
+function editSite() { openSiteModal(currentSiteId); }
+
+// ==============================
+// STATUS
+// ==============================
+function openStatusModal() { openModal('status-modal'); }
+function setStatus(status) {
+  const idx = DB.sites.findIndex(s => s.id === currentSiteId);
+  if (idx < 0) return;
+  DB.sites[idx].status = status;
+  saveDB();
+  closeModal('status-modal');
+  openDetail(currentSiteId);
+  showToast('ステータスを「' + status + '」に変更しました', 'ok');
+  if (status === '工事完了') showPage('dashboard');
+}
+
+// ==============================
+// VENDOR
+// ==============================
+function openVendorModal(vendorId) {
+  editingVendorId = vendorId || null;
+  document.getElementById('vendor-modal-title').textContent = vendorId ? '業者編集' : '業者登録';
+  if (vendorId) {
+    const v = DB.vendors.find(x => x.id === vendorId);
+    document.getElementById('v-id').value = v.id;
+    document.getElementById('v-name').value = v.name;
+    document.getElementById('v-rep').value = v.rep||'';
+    document.getElementById('v-phone').value = v.phone||'';
+    document.getElementById('v-mobile').value = v.mobile||'';
+    document.getElementById('v-addr').value = v.addr||'';
+  } else {
+    ['v-id','v-name','v-rep','v-phone','v-mobile','v-addr'].forEach(id => document.getElementById(id).value='');
+  }
+  openModal('vendor-modal');
+}
+
+function saveVendor() {
+  const name = document.getElementById('v-name').value.trim();
+  if (!name) { showToast('業者名を入力してください', 'err'); return; }
+  const data = {
+    name, rep: document.getElementById('v-rep').value,
+    phone: document.getElementById('v-phone').value,
+    mobile: document.getElementById('v-mobile').value,
+    addr: document.getElementById('v-addr').value,
+    active: true,
+  };
+  if (editingVendorId) {
+    const idx = DB.vendors.findIndex(v => v.id === editingVendorId);
+    if (idx >= 0) DB.vendors[idx] = { ...DB.vendors[idx], ...data };
+    showToast('業者情報を更新しました', 'ok');
+  } else {
+    DB.vendors.push({ id: genId('VND'), token: genToken(), ...data });
+    showToast('業者を登録しました', 'ok');
+  }
+  saveDB();
+  closeModal('vendor-modal');
+  renderVendors();
+}
+
+function renderVendors() {
+  const q = (document.getElementById('vendor-search').value||'').toLowerCase();
+  const list = DB.vendors.filter(v => !q || v.name.toLowerCase().includes(q) || (v.rep||'').toLowerCase().includes(q));
+  const tbody = document.getElementById('vendor-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:32px">業者が登録されていません</td></tr>'; return; }
+  tbody.innerHTML = list.map(v => `<tr>
+    <td><div class="vendor-name-cell"><div class="vendor-avatar">${v.name.slice(0,2)}</div>${v.name}</div></td>
+    <td>${v.rep||'-'}</td>
+    <td>${v.phone||'-'}</td>
+    <td>${v.mobile||'-'}</td>
+    <td style="font-size:12px">${v.addr||'-'}</td>
+    <td>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-xs" onclick="openVendorModal('${v.id}')">編集</button>
+        <button class="qr-btn" onclick="showQR('${v.id}')">QR</button>
+        <button class="btn btn-xs" style="background:var(--red-light);color:var(--red)" onclick="invalidateVendor('${v.id}')">無効化</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function invalidateVendor(vid) {
+  if (!confirm('このQRコードを無効化しますか？\n職人からのアクセスが即座に停止されます。')) return;
+  const v = DB.vendors.find(x => x.id === vid);
+  if (v) { v.active = false; saveDB(); renderVendors(); showToast('QRコードを無効化しました'); }
+}
+
+// ==============================
+// QR CODE
+// ==============================
+function showQR(vendorId) {
+  const v = DB.vendors.find(x => x.id === vendorId);
+  if (!v) return;
+  const uploadUrl = DB.uploadUrl || window.location.origin + '/upload';
+  const qrUrl = uploadUrl + '?v=' + v.token;
+  document.getElementById('qr-modal-title').textContent = v.name + ' QRコード';
+  document.getElementById('qr-url-text').textContent = qrUrl;
+  const canvas = document.getElementById('qr-canvas');
+  canvas.width = 200; canvas.height = 200;
+  try {
+    new QRCode(canvas, { text: qrUrl, width: 200, height: 200, colorDark: '#3D2B1F', colorLight: '#ffffff' });
+  } catch(e) {
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#F3F4F6';
+    ctx.fillRect(0,0,200,200);
+    ctx.fillStyle = '#3D2B1F';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('QRコード', 100, 95);
+    ctx.font = '10px sans-serif';
+    ctx.fillText('ライブラリ読込中...', 100, 115);
+  }
+  openModal('qr-modal');
+}
+
+function downloadQR() {
+  const canvas = document.getElementById('qr-canvas');
+  const a = document.createElement('a');
+  a.download = 'qr-code.png';
+  a.href = canvas.toDataURL();
+  a.click();
+}
+
+function genToken() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(18))).map(b => b.toString(36)).join('').slice(0,32);
+}
+
+// ==============================
+// COMPLETED
+// ==============================
+function renderCompleted() {
+  const q = (document.getElementById('completed-search').value||'').toLowerCase();
+  const list = DB.sites.filter(s => s.status === '工事完了' && (!q || s.name.toLowerCase().includes(q) || (s.address||'').toLowerCase().includes(q) || (s.vendorName||'').toLowerCase().includes(q)));
+  const tbody = document.getElementById('completed-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:32px">完了現場はありません</td></tr>'; return; }
+  tbody.innerHTML = list.map(s => {
+    const pc = DB.photos.filter(p => p.siteId === s.id).length;
+    const period = [s.startDate,s.endDate].filter(Boolean).join(' ～ ').replace(/-/g,'/')||'-';
+    return `<tr>
+      <td><a class="completed-link" onclick="openDetail('${s.id}')">${s.name}</a></td>
+      <td style="font-size:12px">${s.address||'-'}</td>
+      <td>${s.vendorName||'-'}</td>
+      <td style="font-size:12px">${period}</td>
+      <td>${pc}</td>
+      <td style="font-size:12px">${s.endDate||'-'}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="restoreSite('${s.id}')">復元</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function restoreSite(siteId) {
+  const s = DB.sites.find(x => x.id === siteId);
+  if (s) { s.status = '工事前'; saveDB(); renderCompleted(); showToast('「' + s.name + '」を工事前に戻しました', 'ok'); }
+}
+
+// ==============================
+// SETTINGS
+// ==============================
+function loadSettings() {
+  document.getElementById('cfg-gas-url').value = DB.gasUrl || '';
+  document.getElementById('cfg-upload-url').value = DB.uploadUrl || '';
+}
+function saveSettings() {
+  DB.gasUrl = document.getElementById('cfg-gas-url').value.trim();
+  DB.uploadUrl = document.getElementById('cfg-upload-url').value.trim();
+  localStorage.setItem('kk_gas_url', DB.gasUrl);
+  localStorage.setItem('kk_upload_url', DB.uploadUrl);
+  showToast('設定を保存しました', 'ok');
+}
+
+// ==============================
+// MODAL HELPERS
+// ==============================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+// ==============================
+// SIDEBAR (MOBILE)
+// ==============================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ==============================
+// TOAST
+// ==============================
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ==============================
+// INIT
+// ==============================
+renderDashboard();
+</script>
+</body>
+</html>
