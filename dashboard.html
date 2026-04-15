@@ -2065,5 +2065,36 @@ window.loadFromGAS=loadFromGAS;window.showSiteDetail=showSiteDetail;
 window.showToast=showToast;window.saveDB=saveDB;window.genId=genId;window.genToken=genToken;
 window.closeModal=closeModal;window.saveVendor=saveVendor;window.saveSite=saveSite;
 </script>
+
+<script>
+// キャッシュ対策：別スクリプトタグで関数をwindowに公開
+document.addEventListener('DOMContentLoaded', function() {
+  const GAS_URL = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
+  
+  window.deleteSite = async function(siteId) {
+    if (!confirm('この現場を削除しますか？\nスプレッドシートからも削除されます。')) return;
+    try {
+      await fetch(GAS_URL, {method:'POST', headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({action:'deleteSite', siteId})});
+    } catch(e) { console.warn('削除失敗:', e); }
+    const sites = JSON.parse(localStorage.getItem('kk_sites')||'[]').filter(s => s.id !== siteId);
+    localStorage.setItem('kk_sites', JSON.stringify(sites));
+    location.reload();
+  };
+  
+  window.deleteVendor = async function(vendorId) {
+    if (!confirm('この業者を削除しますか？')) return;
+    try {
+      await fetch(GAS_URL, {method:'POST', headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({action:'deleteVendor', vendorId})});
+    } catch(e) { console.warn('業者削除失敗:', e); }
+    const vendors = JSON.parse(localStorage.getItem('kk_vendors')||'[]').filter(v => v.id !== vendorId);
+    localStorage.setItem('kk_vendors', JSON.stringify(vendors));
+    location.reload();
+  };
+  
+  console.log('✅ deleteSite/deleteVendor 公開完了');
+});
+</script>
 </body>
 </html>
