@@ -2048,6 +2048,17 @@ async function loadFromGAS() {
   } catch(e) { console.warn('GAS読み込み失敗:', e); }
 }
 document.addEventListener("DOMContentLoaded", ()=>{ setTimeout(loadFromGAS, 500); });
+
+// グローバル公開（ブロックスコープ対策）
+window.deleteSite=deleteSite;window.deleteVendor=deleteVendor;
+window.showQR=showQR;window.downloadQR=downloadQR;
+window.openSiteModal=openSiteModal;window.closeSiteModal=function(){closeModal('site-modal');};
+window.editSite=editSite;window.openStatusModal=openStatusModal;window.setStatus=setStatus;
+window.openVendorModal=openVendorModal;window.editVendor=editVendor;window.invalidateVendor=invalidateVendor;
+window.showPage=showPage;window.renderDashboard=renderDashboard;window.renderVendors=renderVendors;
+window.loadFromGAS=loadFromGAS;window.showSiteDetail=showSiteDetail;
+window.showToast=showToast;window.saveDB=saveDB;window.genId=genId;window.genToken=genToken;
+window.closeModal=closeModal;window.saveVendor=saveVendor;window.saveSite=saveSite;
 </script>
 </body>
 </html>
