@@ -1345,7 +1345,7 @@ let DB = {
   sites: JSON.parse(localStorage.getItem('kk_sites') || '[]'),
   vendors: JSON.parse(localStorage.getItem('kk_vendors') || '[]'),
   photos: JSON.parse(localStorage.getItem('kk_photos') || '[]'),
-  gasUrl: localStorage.getItem('kk_gas_url') || '',
+  gasUrl: localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec',
   uploadUrl: localStorage.getItem('kk_upload_url') || '',
 };
 
@@ -1718,7 +1718,7 @@ function openSiteModal(siteId) {
   openModal('site-modal');
 }
 
-function saveSite() {
+async function saveSite() {
   const name = document.getElementById('f-name').value.trim();
   if (!name) { showToast('現場名を入力してください', 'err'); return; }
   const vid = document.getElementById('f-vendor-id').value;
@@ -1746,6 +1746,8 @@ function saveSite() {
     DB.sites.push({ id: genId('SITE'), ...data });
     showToast('現場を登録しました', 'ok');
   }
+
+  const _gu=localStorage.getItem('kk_gas_url')||'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';if(_gu){try{const _b=editingSiteId?{action:'updateSite',siteId:editingSiteId,...data}:{action:'createSite',...data};const _r=await fetch(_gu,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(_b)});const _res=await _r.json();if(_res.success&&_res.siteId&&!editingSiteId)data.id=_res.siteId;if(_res.folderId)data.folderId=_res.folderId;}catch(e){console.warn('GAS失敗:',e);}}
   saveDB();
   closeModal('site-modal');
   renderDashboard();
@@ -1757,9 +1759,10 @@ function editSite() { openSiteModal(currentSiteId); }
 // STATUS
 // ==============================
 function openStatusModal() { openModal('status-modal'); }
-function setStatus(status) {
+async function setStatus(status) {
   const idx = DB.sites.findIndex(s => s.id === currentSiteId);
   if (idx < 0) return;
+  const _gs=localStorage.getItem('kk_gas_url')||'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';if(_gs){try{await fetch(_gs,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'updateStatus',siteId:currentSiteId,status})});}catch(e){console.warn('GASステータス失敗:',e);}}
   DB.sites[idx].status = status;
   saveDB();
   closeModal('status-modal');
@@ -1788,7 +1791,7 @@ function openVendorModal(vendorId) {
   openModal('vendor-modal');
 }
 
-function saveVendor() {
+async function saveVendor() {
   const name = document.getElementById('v-name').value.trim();
   if (!name) { showToast('業者名を入力してください', 'err'); return; }
   const data = {
@@ -1806,6 +1809,8 @@ function saveVendor() {
     DB.vendors.push({ id: genId('VND'), token: genToken(), ...data });
     showToast('業者を登録しました', 'ok');
   }
+
+  const _gv=localStorage.getItem('kk_gas_url')||'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';if(_gv){try{const _bv=editingVendorId?{action:'updateVendor',vendorId:editingVendorId,...data}:{action:'createVendor',...data};const _rv=await fetch(_gv,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(_bv)});const _rsv=await _rv.json();if(_rsv.success&&_rsv.token)data.token=_rsv.token;}catch(e){console.warn('GAS業者失敗:',e);}}
   saveDB();
   closeModal('vendor-modal');
   renderVendors();
