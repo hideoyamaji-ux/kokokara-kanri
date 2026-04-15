@@ -1881,7 +1881,7 @@ function renderVendors() {
       <div style="display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-xs" onclick="openVendorModal('${v.id}')">編集</button>
         <button class="qr-btn" onclick="showQR('${v.id}')">QR</button>
-        <button class="btn btn-xs" style="background:var(--red-light);color:var(--red)" onclick="invalidateVendor('${v.id}')">無効化</button>
+        <button class="btn btn-xs" style="background:var(--red-light);color:var(--red)" onclick="invalidateVendor('${v.id}')">無効化</button><button class="btn btn-sm" style="background:#7f1d1d;color:white;margin-left:4px" onclick="deleteVendor('' + v.id + '')">削除</button>
       </div>
     </td>
   </tr>`).join('');
