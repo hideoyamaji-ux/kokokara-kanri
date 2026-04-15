@@ -1961,6 +1961,43 @@ function showToast(msg, type) {
 // INIT
 // ==============================
 renderDashboard();
+
+
+// ======== GASからデータを読み込む ========
+async function loadFromGAS() {
+  const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
+  try {
+    const [sr, vr] = await Promise.all([
+      fetch(gasUrl + '?action=getSites&includeCompleted=true').then(r=>r.json()),
+      fetch(gasUrl + '?action=getVendors').then(r=>r.json())
+    ]);
+    if (sr.success && sr.sites && sr.sites.length > 0) {
+      DB.sites = sr.sites.map(s => ({
+        id: s.site_id, name: s['現場名']||'', address: s['住所']||'',
+        clientPhone: s['施主電話番号']||'', startDate: s['工期開始']||'',
+        endDate: s['工期終了']||'', vendorId: s['業者ID']||'',
+        vendorName: s['業者名']||'', contactName: s['担当者名']||'',
+        contactPhone: s['担当者携帯']||'', lineId: s['LINE_ID']||'',
+        status: s['ステータス']||'工事前', folderId: s['DriveフォルダID']||'',
+        notes: s['特記事項']||'', photos: []
+      }));
+    }
+    if (vr.success && vr.vendors && vr.vendors.length > 0) {
+      DB.vendors = vr.vendors.map(v => ({
+        id: v.vendor_id, name: v['業者名']||'', rep: v['代表者名']||'',
+        phone: v['会社電話番号']||'', mobile: v['代表者携帯番号']||'',
+        addr: v['住所']||'', token: v['アクセストークン']||'',
+        active: v['トークン有効']===true||v['トークン有効']==='TRUE'
+      }));
+    }
+    saveDB();
+    const page = document.querySelector('.nav-item.active')?.id?.replace('nav-','') || 'dashboard';
+    if (page==='vendors') renderVendors();
+    else renderDashboard();
+    console.log('GAS読み込み完了 現場:', DB.sites.length, '業者:', DB.vendors.length);
+  } catch(e) { console.warn('GAS読み込み失敗:', e); }
+}
+document.addEventListener("DOMContentLoaded", ()=>{ setTimeout(loadFromGAS, 500); });
 </script>
 </body>
 </html>
