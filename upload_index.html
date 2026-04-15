@@ -1,939 +1,329 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="現場写真">
-<meta name="theme-color" content="#F5A623">
-<link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<title>ココカラ解体 現場写真</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-<style>
-:root {
-  --orange: #F5A623;
-  --orange-dark: #D4891A;
-  --orange-light: #FFF8EC;
-  --brown: #3D2B1F;
-  --white: #FFFFFF;
-  --gray-50: #FAFAFA;
-  --gray-100: #F4F4F5;
-  --gray-200: #E4E4E7;
-  --gray-400: #A1A1AA;
-  --gray-600: #52525B;
-  --gray-800: #27272A;
-  --green: #16A34A;
-  --green-light: #DCFCE7;
-  --red: #DC2626;
-  --red-light: #FEE2E2;
-  --blue: #2563EB;
-  --radius: 16px;
-  --radius-sm: 12px;
-  --radius-xs: 8px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
-body {
-  font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
-  background: var(--gray-50);
-  color: var(--gray-800);
-  font-size: 15px;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ===== APP SHELL ===== */
-.app {
-  height: 100vh;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* ===== HEADER ===== */
-.app-header {
-  background: #FFFFFF;
-  border-bottom: 1px solid #E4E4E7;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  safe-area-inset-top: env(safe-area-inset-top);
-}
-.header-logo img {
-  height: 36px;
-  width: auto;
-}
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.vendor-chip {
-  background: #FFF7ED;
-  color: #D4891A;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
-/* ===== SCREENS ===== */
-.screen {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  display: none;
-  flex-direction: column;
-}
-.screen.active { display: flex; }
-
-/* ===== SPLASH ===== */
-#screen-splash {
-  background: #FFFFFF;
-  align-items: center;
-  justify-content: center;
-}
-.splash-logo {
-  text-align: center;
-  animation: fadeUp 0.6s ease both;
-}
-.splash-logo img {
-  width: 200px;
-  height: auto;
-  display: block;
-  margin: 0 auto 16px;
-}
-.splash-loader {
-  width: 36px; height: 36px;
-  border: 3px solid rgba(0,0,0,0.08);
-  border-top-color: #F5A623;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 24px auto 0;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-
-/* ===== INSTALL BANNER ===== */
-.install-banner {
-  display: none;
-  background: var(--orange);
-  color: white;
-  padding: 10px 16px;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-.install-banner.show { display: flex; }
-.install-banner p { flex: 1; font-size: 12px; font-weight: 500; line-height: 1.5; }
-.install-btn {
-  background: white;
-  color: var(--orange-dark);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-}
-.install-close {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.7);
-  font-size: 18px;
-  cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
-}
-
-/* ===== SITE LIST ===== */
-#screen-sites {
-  background: var(--gray-50);
-  padding-bottom: calc(16px + var(--safe-bottom));
-}
-.screen-pad { padding: 16px; }
-.screen-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--gray-800);
-  margin-bottom: 4px;
-}
-.screen-sub {
-  font-size: 13px;
-  color: var(--gray-400);
-  margin-bottom: 16px;
-}
-.site-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.site-item {
-  background: white;
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.15s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  -webkit-user-select: none;
-}
-.site-item:active { transform: scale(0.98); background: var(--orange-light); border-color: var(--orange); }
-.site-icon {
-  width: 48px; height: 48px;
-  background: var(--orange-light);
-  border-radius: var(--radius-xs);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.site-icon svg { width: 24px; height: 24px; color: var(--orange); }
-.site-info { flex: 1; min-width: 0; }
-.site-name { font-size: 15px; font-weight: 700; color: var(--gray-800); margin-bottom: 3px; }
-.site-addr { font-size: 12px; color: var(--gray-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.site-period { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
-.site-arrow { color: var(--gray-400); font-size: 18px; flex-shrink: 0; }
-.status-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.dot-inprogress { background: #2563EB; }
-.dot-before { background: #CA8A04; }
-.empty-sites {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--gray-400);
-}
-.empty-sites svg { width: 52px; height: 52px; opacity: 0.3; margin-bottom: 12px; }
-.empty-sites p { font-size: 14px; }
-
-/* ===== UPLOAD SCREEN ===== */
-#screen-upload {
-  background: var(--gray-50);
-  padding-bottom: calc(80px + var(--safe-bottom));
-}
-.upload-site-header {
-  background: var(--orange);
-  padding: 14px 16px;
-  flex-shrink: 0;
-}
-.upload-site-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 2px;
-}
-.upload-site-addr {
-  font-size: 12px;
-  color: rgba(255,255,255,0.75);
-}
-
-/* Camera / Album Buttons */
-.capture-btns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 16px;
-}
-.capture-btn {
-  background: white;
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-sm);
-  padding: 20px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
-}
-.capture-btn:active { transform: scale(0.97); border-color: var(--orange); background: var(--orange-light); }
-.capture-btn.camera { background: var(--orange); border-color: var(--orange); color: white; }
-.capture-btn.camera:active { background: var(--orange-dark); }
-.capture-btn svg { width: 32px; height: 32px; }
-.capture-btn span { font-size: 13px; font-weight: 700; }
-.capture-btn small { font-size: 11px; opacity: 0.7; }
-
-/* Preview */
-.preview-section {
-  padding: 0 16px 16px;
-}
-.preview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.preview-count {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--gray-800);
-}
-.preview-clear {
-  font-size: 12px;
-  color: var(--red);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-}
-.preview-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-.prev-item {
-  aspect-ratio: 1;
-  border-radius: var(--radius-xs);
-  overflow: hidden;
-  position: relative;
-  background: var(--gray-200);
-}
-.prev-item img { width: 100%; height: 100%; object-fit: cover; }
-.prev-del {
-  position: absolute;
-  top: 3px; right: 3px;
-  width: 20px; height: 20px;
-  background: rgba(0,0,0,0.55);
-  border: none; border-radius: 50%;
-  color: white; font-size: 11px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* Comment */
-.comment-section {
-  padding: 0 16px 16px;
-}
-.comment-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-}
-.comment-input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-xs);
-  font-size: 15px;
-  outline: none;
-  font-family: inherit;
-  color: var(--gray-800);
-  resize: none;
-  transition: border-color 0.15s;
-  background: white;
-}
-.comment-input:focus { border-color: var(--orange); }
-
-/* Bottom CTA */
-.bottom-cta {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: white;
-  border-top: 1px solid var(--gray-200);
-  padding: 12px 16px;
-  padding-bottom: calc(12px + var(--safe-bottom));
-  z-index: 100;
-}
-.upload-btn {
-  width: 100%;
-  background: var(--orange);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.15s;
-}
-.upload-btn:active { background: var(--orange-dark); transform: scale(0.99); }
-.upload-btn:disabled { background: var(--gray-200); color: var(--gray-400); transform: none; }
-.upload-btn svg { width: 20px; height: 20px; }
-
-/* ===== SUCCESS SCREEN ===== */
-#screen-success {
-  background: var(--green);
-  align-items: center;
-  justify-content: center;
-}
-.success-content {
-  text-align: center;
-  padding: 40px 32px;
-  animation: fadeUp 0.4s ease both;
-}
-.success-icon {
-  width: 80px; height: 80px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-}
-.success-icon svg { width: 44px; height: 44px; color: white; }
-.success-title { font-size: 22px; font-weight: 700; color: white; margin-bottom: 8px; }
-.success-sub { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 32px; line-height: 1.6; }
-.back-to-list {
-  background: white;
-  color: var(--green);
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 14px 28px;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-/* ===== PROGRESS ===== */
-.upload-progress-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 500;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-}
-.upload-progress-overlay.show { display: flex; }
-.progress-box {
-  background: white;
-  border-radius: var(--radius);
-  padding: 28px 32px;
-  text-align: center;
-  width: 280px;
-}
-.progress-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--gray-800);
-  margin-bottom: 16px;
-}
-.progress-bar {
-  height: 6px;
-  background: var(--gray-200);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-.progress-fill {
-  height: 100%;
-  background: var(--orange);
-  border-radius: 3px;
-  width: 0;
-  transition: width 0.3s;
-}
-.progress-text {
-  font-size: 12px;
-  color: var(--gray-400);
-}
-
-/* ===== ERROR ===== */
-#screen-error {
-  background: var(--red);
-  align-items: center;
-  justify-content: center;
-}
-.error-content {
-  text-align: center;
-  padding: 40px 32px;
-  color: white;
-}
-.error-content svg { width: 52px; height: 52px; opacity: 0.8; margin-bottom: 16px; }
-.error-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-.error-sub { font-size: 13px; opacity: 0.8; margin-bottom: 24px; line-height: 1.6; }
-.retry-btn {
-  background: white;
-  color: var(--red);
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-/* ===== TOAST ===== */
-.toast {
-  position: fixed;
-  bottom: calc(90px + var(--safe-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--gray-800);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 24px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.25s;
-  pointer-events: none;
-  z-index: 200;
-  max-width: 90vw;
-  text-align: center;
-}
-.toast.show { opacity: 1; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>現場写真アップロード</title>
+  <link rel="manifest" href="upload_manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      padding: 16px;
+      color: #1a202c;
+    }
+    .header {
+      background: #2563eb;
+      color: white;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .header h1 { font-size: 18px; font-weight: 700; }
+    .vendor-info {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid #2563eb;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .vendor-info .label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+    .vendor-info .vendor-name { font-size: 20px; font-weight: 700; color: #1e40af; }
+    .vendor-info .vendor-code { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      color: #dc2626;
+      text-align: center;
+    }
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .section-title { font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 12px; }
+    select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #1a202c;
+      background: #f9fafb;
+      appearance: none;
+    }
+    select:focus, textarea:focus { outline: none; border-color: #2563eb; background: white; }
+    textarea { resize: vertical; min-height: 80px; }
+    .upload-area {
+      border: 2px dashed #93c5fd;
+      border-radius: 12px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #eff6ff;
+    }
+    .upload-area:hover, .upload-area.dragover { border-color: #2563eb; background: #dbeafe; }
+    .upload-icon { font-size: 40px; margin-bottom: 8px; }
+    .upload-text { font-size: 15px; color: #2563eb; font-weight: 600; }
+    .upload-sub { font-size: 12px; color: #64748b; margin-top: 4px; }
+    #fileInput { display: none; }
+    .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .preview-item { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #e5e7eb; }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-item .remove-btn {
+      position: absolute; top: 4px; right: 4px;
+      background: rgba(0,0,0,0.6); color: white; border: none;
+      border-radius: 50%; width: 22px; height: 22px; font-size: 13px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .submit-btn {
+      width: 100%; background: #2563eb; color: white; border: none;
+      border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 700;
+      cursor: pointer; margin-top: 8px; transition: background 0.2s;
+    }
+    .submit-btn:hover:not(:disabled) { background: #1d4ed8; }
+    .submit-btn:disabled { background: #93c5fd; cursor: not-allowed; }
+    .progress {
+      background: #dbeafe; border-radius: 8px; padding: 12px 16px;
+      margin-top: 12px; text-align: center; color: #1d4ed8;
+      font-size: 14px; display: none;
+    }
+    .success-box {
+      background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px;
+      padding: 20px; text-align: center; margin-top: 16px; display: none;
+    }
+    .success-box .check { font-size: 40px; margin-bottom: 8px; }
+    .success-box p { color: #16a34a; font-weight: 600; font-size: 16px; }
+    .success-box .sub { color: #64748b; font-size: 13px; margin-top: 4px; }
+    .reset-btn {
+      background: #f1f5f9; color: #475569; border: none;
+      border-radius: 8px; padding: 10px 24px; font-size: 14px;
+      cursor: pointer; margin-top: 12px;
+    }
+    .loading-spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.5); border-top-color: white;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
 
-<div class="app">
-
-  <!-- HEADER (グローバル) -->
-  <header class="app-header" id="app-header" style="display:none">
-    <div class="header-logo">
-      <img src="https://kokokara-kaitai.com/wp-content/themes/rd_kaitai2025-2/image/base/hd-logo.png" alt="ココカラ解体">
-    </div>
-    <div class="header-right">
-      <div class="vendor-chip" id="vendor-chip">読み込み中...</div>
-    </div>
-  </header>
-
-  <!-- インストールバナー -->
-  <div class="install-banner" id="install-banner">
-    <p>📱 ホーム画面に追加すると<br>次回からアイコンで起動できます！</p>
-    <button class="install-btn" onclick="triggerInstall()">追加する</button>
-    <button class="install-close" onclick="hideInstallBanner()">✕</button>
-  </div>
-
-  <!-- ===== SPLASH ===== -->
-  <div class="screen active" id="screen-splash" style="display:flex">
-    <div class="splash-logo">
-      <img src="https://kokokara-kaitai.com/wp-content/themes/rd_kaitai2025-2/image/base/hd-logo.png" alt="ココカラ解体">
-      <div class="splash-loader"></div>
-    </div>
-  </div>
-
-  <!-- ===== ERROR ===== -->
-  <div class="screen" id="screen-error">
-    <div class="error-content">
-      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <div class="error-title">アクセスできません</div>
-      <div class="error-sub" id="error-msg">QRコードが正しくないか、アクセス権限がありません。<br>担当者にお問い合わせください。</div>
-      <button class="retry-btn" onclick="location.reload()">再試行</button>
-    </div>
-  </div>
-
-  <!-- ===== SITE LIST ===== -->
-  <div class="screen" id="screen-sites">
-    <div class="screen-pad">
-      <div class="screen-title">担当現場一覧</div>
-      <div class="screen-sub" id="vendor-name-sub">現場を選んで写真をアップロード</div>
-      <div class="site-list" id="site-list"></div>
-    </div>
-  </div>
-
-  <!-- ===== UPLOAD ===== -->
-  <div class="screen" id="screen-upload">
-    <div class="upload-site-header">
-      <div class="upload-site-name" id="upload-site-name">-</div>
-      <div class="upload-site-addr" id="upload-site-addr">-</div>
-    </div>
-
-    <!-- カメラ / アルバム -->
-    <div class="capture-btns">
-      <button class="capture-btn camera" onclick="openCamera()">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span>カメラで撮影</span>
-        <small>その場で撮る</small>
-      </button>
-      <button class="capture-btn album" onclick="openAlbum()">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span>アルバムから</span>
-        <small>複数選択可</small>
-      </button>
-    </div>
-    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleFiles(this.files)">
-    <input type="file" id="album-input" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
-
-    <!-- プレビュー -->
-    <div class="preview-section" id="preview-section" style="display:none">
-      <div class="preview-header">
-        <div class="preview-count" id="preview-count">0枚選択中</div>
-        <button class="preview-clear" onclick="clearFiles()">すべて削除</button>
-      </div>
-      <div class="preview-grid" id="preview-grid"></div>
-    </div>
-
-    <!-- コメント -->
-    <div class="comment-section">
-      <div class="comment-label">コメント（任意）</div>
-      <textarea class="comment-input" id="comment-input" rows="3" placeholder="例：1階解体前の状況　外壁の状態など"></textarea>
-    </div>
-  </div>
-
-  <!-- ===== SUCCESS ===== -->
-  <div class="screen" id="screen-success">
-    <div class="success-content">
-      <div class="success-icon">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <div class="success-title">アップロード完了！</div>
-      <div class="success-sub" id="success-msg">写真を送信しました。<br>ありがとうございます。</div>
-      <button class="back-to-list" onclick="goBack()">現場一覧に戻る</button>
-    </div>
-  </div>
-
-</div><!-- /app -->
-
-<!-- 送信ボタン（固定フッター） -->
-<div class="bottom-cta" id="bottom-cta" style="display:none">
-  <button class="upload-btn" id="upload-btn" onclick="doUpload()" disabled>
-    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    写真を送信する
-  </button>
+<div class="header">
+  <h1>📷 現場写真アップロード</h1>
 </div>
 
-<!-- アップロード中オーバーレイ -->
-<div class="upload-progress-overlay" id="upload-overlay">
-  <div class="progress-box">
-    <div class="progress-title" id="prog-title">アップロード中...</div>
-    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
-    <div class="progress-text" id="prog-text">0 / 0</div>
-  </div>
+<div id="vendorInfo" class="vendor-info" style="display:none;">
+  <div class="label">アップロード業者</div>
+  <div class="vendor-name" id="vendorName">—</div>
+  <div class="vendor-code" id="vendorCodeDisplay"></div>
 </div>
 
-<!-- トースト -->
-<div class="toast" id="toast"></div>
+<div id="errorBox" class="error-box" style="display:none;">
+  ⚠️ <span id="errorMsg">業者情報を取得できませんでした</span>
+</div>
+
+<div id="mainForm" style="display:none;">
+  <div class="section">
+    <div class="section-title">📍 現場を選択</div>
+    <select id="siteSelect">
+      <option value="">読み込み中…</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📸 写真を選択（複数可）</div>
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📷</div>
+      <div class="upload-text">タップして写真を選択</div>
+      <div class="upload-sub">またはここにドロップ</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" multiple>
+    <div class="preview-grid" id="previewGrid"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📝 メモ（任意）</div>
+    <textarea id="memo" placeholder="工事内容や特記事項など"></textarea>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitPhotos()">アップロード</button>
+
+  <div class="progress" id="progress">
+    <span class="loading-spinner"></span><span id="progressText">アップロード中...</span>
+  </div>
+
+  <div class="success-box" id="successBox">
+    <div class="check">✅</div>
+    <p>アップロード完了！</p>
+    <div class="sub" id="successDetail"></div>
+    <br>
+    <button class="reset-btn" onclick="resetForm()">続けてアップロード</button>
+  </div>
+</div>
 
 <script>
-// ==============================
-// STATE
-// ==============================
-let vendorToken = '';
-let vendorInfo = null;
-let currentSite = null;
-let pendingFiles = [];
-let gasUrl = '';
-let deferredPrompt = null;
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
+var vendorData = null;
+var selectedFiles = [];
 
-// ==============================
-// INIT
-// ==============================
-window.addEventListener('load', async () => {
-  // Service Worker 登録
-  if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('./sw.js');
-    } catch(e) { console.log('SW reg failed:', e); }
-  }
+function getParam(name) {
+  return new URLSearchParams(location.search).get(name);
+}
 
-  // URLパラメータからトークン取得
-  const params = new URLSearchParams(location.search);
-  vendorToken = params.get('v') || localStorage.getItem('kk_vendor_token') || '';
-  gasUrl = localStorage.getItem('kk_gas_url') || '';
-
-  if (vendorToken) {
-    localStorage.setItem('kk_vendor_token', vendorToken);
-  }
-
-  // GAS URL未設定 or トークンなし → デモモード
-  setTimeout(() => {
-    if (!vendorToken) {
-      showError('QRコードからアクセスしてください。');
-      return;
-    }
-    loadVendorSites();
-  }, 1200);
-});
-
-// PWAインストールプロンプト
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  setTimeout(() => document.getElementById('install-banner').classList.add('show'), 3000);
-});
-
-async function loadVendorSites() {
-  if (!gasUrl) {
-    // デモモード（GAS未設定）
-    loadDemoData();
-    return;
-  }
+async function loadVendor() {
+  var code = getParam('code');
+  if (!code) { showError('URLに ?code=XXXX が必要です'); return; }
   try {
-    const res = await fetch(gasUrl + '?action=getVendorSites&token=' + vendorToken);
-    const data = await res.json();
-    if (!data.success) { showError(data.error || 'アクセス権限がありません'); return; }
-    vendorInfo = data.vendor;
-    renderSiteList(data.sites);
+    var res = await fetch(GAS_URL + '?action=getVendorByCode&code=' + encodeURIComponent(code));
+    var data = await res.json();
+    if (!data.success || !data.vendor) { showError('業者コード「' + code + '」が見つかりません'); return; }
+    vendorData = data.vendor;
+    document.getElementById('vendorName').textContent = vendorData['業者名'] || '不明';
+    document.getElementById('vendorCodeDisplay').textContent = 'コード: ' + code;
+    document.getElementById('vendorInfo').style.display = 'block';
+    document.getElementById('mainForm').style.display = 'block';
+    loadSites();
+  } catch(e) { showError('通信エラー: ' + e.message); }
+}
+
+function showError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('errorBox').style.display = 'block';
+}
+
+async function loadSites() {
+  try {
+    var res = await fetch(GAS_URL + '?action=getSites');
+    var data = await res.json();
+    var sel = document.getElementById('siteSelect');
+    sel.innerHTML = '<option value="">現場を選択してください</option>';
+    if (data.success && data.sites) {
+      data.sites.forEach(function(s) {
+        var opt = document.createElement('option');
+        opt.value = s.site_id;
+        opt.textContent = s['現場名'] || s.site_id;
+        sel.appendChild(opt);
+      });
+    }
   } catch(e) {
-    // オフライン時はキャッシュから
-    loadDemoData();
+    document.getElementById('siteSelect').innerHTML = '<option value="">現場の読み込みに失敗しました</option>';
   }
 }
 
-function loadDemoData() {
-  vendorInfo = { name: '山田建設株式会社' };
-  const sites = [
-    { site_id:'SITE_001', name:'中村邸解体工事', address:'徳島県徳島市南沖洲1-3-5', status:'工事中', startDate:'2026-04-01', endDate:'2026-04-30' },
-    { site_id:'SITE_002', name:'佐藤ビル解体', address:'徳島県鳴門市鳴門町65', status:'工事前', startDate:'2026-05-01', endDate:'2026-06-15' },
-  ];
-  renderSiteList(sites);
-}
+document.getElementById('uploadArea').addEventListener('click', function() {
+  document.getElementById('fileInput').click();
+});
+document.getElementById('uploadArea').addEventListener('dragover', function(e) {
+  e.preventDefault(); this.classList.add('dragover');
+});
+document.getElementById('uploadArea').addEventListener('dragleave', function() {
+  this.classList.remove('dragover');
+});
+document.getElementById('uploadArea').addEventListener('drop', function(e) {
+  e.preventDefault(); this.classList.remove('dragover'); addFiles(e.dataTransfer.files);
+});
+document.getElementById('fileInput').addEventListener('change', function() {
+  addFiles(this.files); this.value = '';
+});
 
-function renderSiteList(sites) {
-  document.getElementById('app-header').style.display = 'flex';
-  document.getElementById('vendor-chip').textContent = vendorInfo.name;
-  document.getElementById('vendor-name-sub').textContent = vendorInfo.name + 'の担当現場';
-
-  const list = document.getElementById('site-list');
-  if (!sites.length) {
-    list.innerHTML = '<div class="empty-sites"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><p>担当現場はありません</p></div>';
-  } else {
-    list.innerHTML = sites.map(s => {
-      const dotClass = s.status === '工事中' ? 'dot-inprogress' : 'dot-before';
-      const period = [s.startDate, s.endDate].filter(Boolean).join(' ～ ').replace(/-/g,'/') || '';
-      return `<div class="site-item" onclick="selectSite(${JSON.stringify(s).replace(/"/g,'&quot;')})">
-        <div class="site-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-        <div class="site-info">
-          <div class="site-name">${s.name}</div>
-          <div class="site-addr">${s.address || '住所未設定'}</div>
-          ${period ? `<div class="site-period">📅 ${period}</div>` : ''}
-        </div>
-        <div class="status-dot ${dotClass}"></div>
-        <div class="site-arrow">›</div>
-      </div>`;
-    }).join('');
-  }
-  showScreen('sites');
-}
-
-// ==============================
-// SITE SELECTION
-// ==============================
-function selectSite(site) {
-  currentSite = site;
-  document.getElementById('upload-site-name').textContent = site.name;
-  document.getElementById('upload-site-addr').textContent = site.address || '';
-  pendingFiles = [];
-  renderPreviews();
-  document.getElementById('comment-input').value = '';
-  showScreen('upload');
-  document.getElementById('bottom-cta').style.display = 'block';
-}
-
-function goBack() {
-  currentSite = null;
-  pendingFiles = [];
-  document.getElementById('bottom-cta').style.display = 'none';
-  showScreen('sites');
-}
-
-// ==============================
-// FILE HANDLING
-// ==============================
-function openCamera() { document.getElementById('camera-input').click(); }
-function openAlbum() { document.getElementById('album-input').click(); }
-
-function handleFiles(fileList) {
-  pendingFiles = [...pendingFiles, ...Array.from(fileList)];
-  renderPreviews();
-  // リセット（同じファイルを再選択できるように）
-  document.getElementById('camera-input').value = '';
-  document.getElementById('album-input').value = '';
-}
-
-function renderPreviews() {
-  const section = document.getElementById('preview-section');
-  const grid = document.getElementById('preview-grid');
-  const btn = document.getElementById('upload-btn');
-  const count = document.getElementById('preview-count');
-
-  if (!pendingFiles.length) {
-    section.style.display = 'none';
-    btn.disabled = true;
-    return;
-  }
-  section.style.display = 'block';
-  btn.disabled = false;
-  count.textContent = pendingFiles.length + '枚選択中';
-  grid.innerHTML = '';
-  pendingFiles.forEach((f, i) => {
-    const div = document.createElement('div');
-    div.className = 'prev-item';
-    const reader = new FileReader();
-    reader.onload = e => {
-      div.innerHTML = `<img src="${e.target.result}"><button class="prev-del" onclick="removeFile(${i})">✕</button>`;
-    };
-    reader.readAsDataURL(f);
-    grid.appendChild(div);
-  });
-}
-
-function removeFile(i) {
-  pendingFiles.splice(i, 1);
-  renderPreviews();
-}
-
-function clearFiles() {
-  pendingFiles = [];
-  renderPreviews();
-}
-
-// ==============================
-// COMPRESS
-// ==============================
-async function compressImage(file) {
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX = 1920;
-        let w = img.width, h = img.height;
-        if (w > MAX || h > MAX) {
-          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-          else { w = Math.round(w * MAX / h); h = MAX; }
-        }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.82);
-      };
-      img.src = e.target.result;
+function addFiles(files) {
+  Array.from(files).forEach(function(file) {
+    if (!file.type.startsWith('image/')) return;
+    selectedFiles.push(file);
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var div = document.createElement('div');
+      div.className = 'preview-item';
+      var idx = selectedFiles.length - 1;
+      div.innerHTML = '<img src="' + ev.target.result + '"><button class="remove-btn" onclick="removeFile(' + idx + ', this)">✕</button>';
+      document.getElementById('previewGrid').appendChild(div);
     };
     reader.readAsDataURL(file);
   });
 }
 
-// ==============================
-// UPLOAD
-// ==============================
-async function doUpload() {
-  if (!pendingFiles.length) { showToast('写真を選んでください'); return; }
-  const comment = document.getElementById('comment-input').value.trim();
-  const today = new Date().toISOString().slice(0, 10);
-  const overlay = document.getElementById('upload-overlay');
-  const fill = document.getElementById('prog-fill');
-  const text = document.getElementById('prog-text');
-  const title = document.getElementById('prog-title');
+function removeFile(idx, btn) {
+  selectedFiles[idx] = null;
+  btn.parentElement.remove();
+}
 
-  overlay.classList.add('show');
+function toBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function() { resolve(reader.result.split(',')[1]); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-  let uploaded = 0;
-  for (let i = 0; i < pendingFiles.length; i++) {
-    title.textContent = `圧縮・送信中... (${i+1}/${pendingFiles.length})`;
-    fill.style.width = (i / pendingFiles.length * 100) + '%';
-    text.textContent = `${i} / ${pendingFiles.length} 枚完了`;
+async function submitPhotos() {
+  var siteId = document.getElementById('siteSelect').value;
+  if (!siteId) { alert('現場を選択してください'); return; }
+  var validFiles = selectedFiles.filter(function(f) { return f !== null; });
+  if (validFiles.length === 0) { alert('写真を選択してください'); return; }
 
-    const compressed = await compressImage(pendingFiles[i]);
+  var btn = document.getElementById('submitBtn');
+  var progress = document.getElementById('progress');
+  var progressText = document.getElementById('progressText');
+  btn.disabled = true;
+  progress.style.display = 'block';
 
-    if (gasUrl) {
-      try {
-        const b64 = await new Promise(res => {
-          const r = new FileReader();
-          r.onload = e => res(e.target.result.split(',')[1]);
-          r.readAsDataURL(compressed);
-        });
-        const resp = await fetch(gasUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'uploadPhoto',
-            token: vendorToken,
-            siteId: currentSite.site_id,
-            siteName: currentSite.name,
-            fileName: pendingFiles[i].name || `photo_${i+1}.jpg`,
-            fileData: b64,
-            comment: comment,
-            captureDate: today,
-          })
-        });
-        const d = await resp.json();
-        if (d.success) uploaded++;
-      } catch(e) {
-        console.warn('Upload failed for file', i, e);
-      }
-    } else {
-      // デモモード：成功扱い
-      await new Promise(r => setTimeout(r, 500));
-      uploaded++;
-    }
+  var successCount = 0;
+  for (var i = 0; i < validFiles.length; i++) {
+    progressText.textContent = (i+1) + ' / ' + validFiles.length + ' 枚アップロード中...';
+    try {
+      var b64 = await toBase64(validFiles[i]);
+      var payload = {
+        action: 'uploadPhoto',
+        site_id: siteId,
+        vendor_id: vendorData.vendor_id || '',
+        vendorCode: vendorData.vendorCode || '',
+        fileName: validFiles[i].name,
+        mimeType: validFiles[i].type,
+        fileData: b64,
+        memo: document.getElementById('memo').value
+      };
+      var res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      var result = await res.json();
+      if (result.success) successCount++;
+    } catch(e) { console.error('Upload error:', e); }
   }
 
-  fill.style.width = '100%';
-  text.textContent = `${uploaded} / ${pendingFiles.length} 枚完了`;
-  await new Promise(r => setTimeout(r, 600));
-  overlay.classList.remove('show');
-
-  // 成功画面へ
-  document.getElementById('success-msg').textContent =
-    `${uploaded}枚の写真を「${currentSite.name}」に\n送信しました。ありがとうございます！`;
-  document.getElementById('bottom-cta').style.display = 'none';
-  showScreen('success');
+  progress.style.display = 'none';
+  document.getElementById('successDetail').textContent = successCount + '枚の写真をアップロードしました';
+  document.getElementById('successBox').style.display = 'block';
 }
 
-// ==============================
-// SCREEN CONTROL
-// ==============================
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
+function resetForm() {
+  selectedFiles = [];
+  document.getElementById('previewGrid').innerHTML = '';
+  document.getElementById('memo').value = '';
+  document.getElementById('siteSelect').value = '';
+  document.getElementById('successBox').style.display = 'none';
+  document.getElementById('submitBtn').disabled = false;
 }
 
-function showError(msg) {
-  document.getElementById('error-msg').textContent = msg;
-  document.getElementById('app-header').style.display = 'none';
-  showScreen('error');
-}
-
-// ==============================
-// PWA INSTALL
-// ==============================
-function triggerInstall() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(result => {
-      deferredPrompt = null;
-      hideInstallBanner();
-      if (result.outcome === 'accepted') showToast('ホーム画面に追加しました！');
-    });
-  } else {
-    // iOS向け手順を表示
-    showToast('Safari: 共有ボタン → ホーム画面に追加');
-  }
-}
-function hideInstallBanner() {
-  document.getElementById('install-banner').classList.remove('show');
-}
-
-// ==============================
-// TOAST
-// ==============================
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
+loadVendor();
 </script>
 </body>
-</html>
+      </html>
