@@ -1759,27 +1759,43 @@ async function deleteSite(siteId) {
   if (!confirm('この現場を削除してもよいですか？\nスプレッドシートからも削除されます。')) return;
   const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
   try {
-    await fetch(gasUrl, {
+    const r = await fetch(gasUrl, {
       method: 'POST',
       headers: {'Content-Type': 'text/plain'},
       body: JSON.stringify({action: 'deleteSite', siteId})
     });
+    const res = await r.json();
+    console.log('削除結果:', res);
   } catch(e) { console.warn('GAS削除失敗:', e); }
   DB.sites = DB.sites.filter(s => s.id !== siteId);
   saveDB();
   showPage('dashboard');
   showToast('現場を削除しました', 'ok');
 }
+,
+      body: JSON.stringify({action: 'deleteVendor', vendorId})
+    });
+    const res = await r.json();
+    console.log('業者削除結果:', res);
+  } catch(e) { console.warn('GAS業者削除失敗:', e); }
+  DB.vendors = DB.vendors.filter(v => v.id !== vendorId);
+  saveDB();
+  renderVendors();
+  showToast('業者を削除しました', 'ok');
+}
+
 
 async function deleteVendor(vendorId) {
   if (!confirm('この業者を削除してもよいですか？')) return;
   const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
   try {
-    await fetch(gasUrl, {
+    const r = await fetch(gasUrl, {
       method: 'POST',
       headers: {'Content-Type': 'text/plain'},
       body: JSON.stringify({action: 'deleteVendor', vendorId})
     });
+    const res = await r.json();
+    console.log('業者削除結果:', res);
   } catch(e) { console.warn('GAS業者削除失敗:', e); }
   DB.vendors = DB.vendors.filter(v => v.id !== vendorId);
   saveDB();
