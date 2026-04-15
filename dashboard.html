@@ -1024,6 +1024,7 @@ textarea.form-input { resize: vertical; }
           </div>
           <div class="detail-header-actions">
             <button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.2)" onclick="openStatusModal()">ステータス変更</button>
+            <button class="btn btn-sm" style="background:rgba(220,38,38,0.7);color:white;border:none" onclick="deleteSite(currentSiteId)">🗑 削除</button>
             <button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.2)" onclick="editSite()">編集</button>
           </div>
         </div>
@@ -1751,6 +1752,39 @@ async function saveSite() {
   saveDB();
   closeModal('site-modal');
   renderDashboard();
+}
+
+
+async function deleteSite(siteId) {
+  if (!confirm('この現場を削除してもよいですか？\nスプレッドシートからも削除されます。')) return;
+  const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
+  try {
+    await fetch(gasUrl, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({action: 'deleteSite', siteId})
+    });
+  } catch(e) { console.warn('GAS削除失敗:', e); }
+  DB.sites = DB.sites.filter(s => s.id !== siteId);
+  saveDB();
+  showPage('dashboard');
+  showToast('現場を削除しました', 'ok');
+}
+
+async function deleteVendor(vendorId) {
+  if (!confirm('この業者を削除してもよいですか？')) return;
+  const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
+  try {
+    await fetch(gasUrl, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({action: 'deleteVendor', vendorId})
+    });
+  } catch(e) { console.warn('GAS業者削除失敗:', e); }
+  DB.vendors = DB.vendors.filter(v => v.id !== vendorId);
+  saveDB();
+  renderVendors();
+  showToast('業者を削除しました', 'ok');
 }
 
 function editSite() { openSiteModal(currentSiteId); }
