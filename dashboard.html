@@ -1416,7 +1416,7 @@ function makeThumb(url, w, h) {
 // ==============================
 // PAGE ROUTING
 // ==============================
-function showPage(page) {
+window.showPage = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
@@ -1437,7 +1437,7 @@ function showPage(page) {
 // ==============================
 // DASHBOARD
 // ==============================
-function renderDashboard() {
+window.renderDashboard = function() {
   const active = DB.sites.filter(s => s.status !== '工事完了');
   const inprog = DB.sites.filter(s => s.status === '工事中');
   document.getElementById('st-active').textContent = active.length;
@@ -1689,7 +1689,7 @@ document.addEventListener('keydown', e => {
 // ==============================
 // SITE MODAL
 // ==============================
-function openSiteModal(siteId) {
+window.openSiteModal = function(siteId) {
   editingSiteId = siteId || null;
   document.getElementById('site-modal-title').textContent = siteId ? '現場編集' : '現場登録';
   const fi = document.getElementById('f-vendor-id');
@@ -1719,7 +1719,7 @@ function openSiteModal(siteId) {
   openModal('site-modal');
 }
 
-async function saveSite() {
+window.saveSite = async function() {
   const name = document.getElementById('f-name').value.trim();
   if (!name) { showToast('現場名を入力してください', 'err'); return; }
   const vid = document.getElementById('f-vendor-id').value;
@@ -1755,7 +1755,7 @@ async function saveSite() {
 }
 
 
-async function deleteSite(siteId) {
+window.deleteSite = async function(siteId) {
   if (!confirm('この現場を削除してもよいですか？\nスプレッドシートからも削除されます。')) return;
   const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
   try {
@@ -1785,7 +1785,7 @@ async function deleteSite(siteId) {
 }
 
 
-async function deleteVendor(vendorId) {
+window.deleteVendor = async function(vendorId) {
   if (!confirm('この業者を削除してもよいですか？')) return;
   const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
   try {
@@ -1803,13 +1803,13 @@ async function deleteVendor(vendorId) {
   showToast('業者を削除しました', 'ok');
 }
 
-function editSite() { openSiteModal(currentSiteId); }
+window.editSite = function() { openSiteModal(currentSiteId); }
 
 // ==============================
 // STATUS
 // ==============================
-function openStatusModal() { openModal('status-modal'); }
-async function setStatus(status) {
+window.openStatusModal = function() { openModal('status-modal'); }
+window.setStatus = async function(status) {
   const idx = DB.sites.findIndex(s => s.id === currentSiteId);
   if (idx < 0) return;
   const _gs=localStorage.getItem('kk_gas_url')||'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';if(_gs){try{await fetch(_gs,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'updateStatus',siteId:currentSiteId,status})});}catch(e){console.warn('GASステータス失敗:',e);}}
@@ -1824,7 +1824,7 @@ async function setStatus(status) {
 // ==============================
 // VENDOR
 // ==============================
-function openVendorModal(vendorId) {
+window.openVendorModal = function(vendorId) {
   editingVendorId = vendorId || null;
   document.getElementById('vendor-modal-title').textContent = vendorId ? '業者編集' : '業者登録';
   if (vendorId) {
@@ -1841,7 +1841,7 @@ function openVendorModal(vendorId) {
   openModal('vendor-modal');
 }
 
-async function saveVendor() {
+window.saveVendor = async function() {
   const name = document.getElementById('v-name').value.trim();
   if (!name) { showToast('業者名を入力してください', 'err'); return; }
   const data = {
@@ -1866,7 +1866,7 @@ async function saveVendor() {
   renderVendors();
 }
 
-function renderVendors() {
+window.renderVendors = function() {
   const q = (document.getElementById('vendor-search').value||'').toLowerCase();
   const list = DB.vendors.filter(v => !q || v.name.toLowerCase().includes(q) || (v.rep||'').toLowerCase().includes(q));
   const tbody = document.getElementById('vendor-tbody');
@@ -1887,7 +1887,7 @@ function renderVendors() {
   </tr>`).join('');
 }
 
-function invalidateVendor(vid) {
+window.invalidateVendor = function(vid) {
   if (!confirm('このQRコードを無効化しますか？\n職人からのアクセスが即座に停止されます。')) return;
   const v = DB.vendors.find(x => x.id === vid);
   if (v) { v.active = false; saveDB(); renderVendors(); showToast('QRコードを無効化しました'); }
@@ -1896,7 +1896,7 @@ function invalidateVendor(vid) {
 // ==============================
 // QR CODE
 // ==============================
-function showQR(vendorId) {
+window.showQR = function(vendorId) {
   const v = DB.vendors.find(x => x.id === vendorId);
   if (!v) return;
   const uploadUrl = DB.uploadUrl || window.location.origin + '/upload';
@@ -1921,7 +1921,7 @@ function showQR(vendorId) {
   openModal('qr-modal');
 }
 
-function downloadQR() {
+window.downloadQR = function() {
   const canvas = document.getElementById('qr-canvas');
   const a = document.createElement('a');
   a.download = 'qr-code.png';
@@ -1936,7 +1936,7 @@ function genToken() {
 // ==============================
 // COMPLETED
 // ==============================
-function renderCompleted() {
+window.renderCompleted = function() {
   const q = (document.getElementById('completed-search').value||'').toLowerCase();
   const list = DB.sites.filter(s => s.status === '工事完了' && (!q || s.name.toLowerCase().includes(q) || (s.address||'').toLowerCase().includes(q) || (s.vendorName||'').toLowerCase().includes(q)));
   const tbody = document.getElementById('completed-tbody');
@@ -1980,7 +1980,7 @@ function saveSettings() {
 // MODAL HELPERS
 // ==============================
 function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
 });
@@ -2000,7 +2000,7 @@ function closeSidebar() {
 // ==============================
 // TOAST
 // ==============================
-function showToast(msg, type) {
+window.showToast = function(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show' + (type ? ' '+type : '');
@@ -2014,7 +2014,7 @@ renderDashboard();
 
 
 // ======== GASからデータを読み込む ========
-async function loadFromGAS() {
+window.loadFromGAS = async function() {
   const gasUrl = localStorage.getItem('kk_gas_url') || 'https://script.google.com/macros/s/AKfycbydyrr8_1U1mL8H6ck7cpsmBCvN_0V4r7aU5Gn7U6mX6ATG9DUTjU_3v-RIbY8gTVIy8w/exec';
   try {
     const [sr, vr] = await Promise.all([
