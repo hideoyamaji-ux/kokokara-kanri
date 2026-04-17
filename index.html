@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_19.html -->
+<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_11.html -->
 <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -753,7 +753,7 @@ body {
 ============================================================ -->
 <header class="header">
   <div class="header-inner">
-    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_19.html#" onclick="showPage(&#39;dashboard&#39;)">
+    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_11.html#" onclick="showPage(&#39;dashboard&#39;)">
       <div class="logo-icon">K</div>
       <span class="logo-text">ココカラ<span>解体</span></span>
     </a>
@@ -784,7 +784,7 @@ body {
   <div class="container">
     <div class="dashboard-header">
       <h1 style="font-size:18px;font-weight:700;color:var(--gray-900)">現場一覧</h1>
-      <span class="site-count" id="site-count">7件</span>
+      <span class="site-count" id="site-count">8件</span>
     </div>
     <div class="cards-grid" id="cards-grid"><div class="site-card" onclick="openSite(&#39;S-0001&#39;)">
     <div class="card-photos">
@@ -802,7 +802,7 @@ body {
   </div><div class="site-card" onclick="openSite(&#39;S-0002&#39;)">
     <div class="card-photos">
       <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
-      <div class="photo-count-badge">📷 5枚</div>
+      <div class="photo-count-badge">📷 6枚</div>
     </div>
     <div class="card-body">
       <div class="card-name">trスト</div>
@@ -817,7 +817,7 @@ body {
     <div class="card-body">
       <div class="card-name">テスト邸２</div>
       <div class="card-meta">
-        
+        <div class="card-meta-row">🏢 テスト業者（更新確認）</div>
         
       </div>
       <span class="status-badge status-着工前">着工前</span>
@@ -862,6 +862,16 @@ body {
       <div class="card-meta">
         <div class="card-meta-row">🏢 山本解体株式会社</div>
         <div class="card-meta-row">📅 2026/04/18 〜 2026/04/30</div>
+      </div>
+      <span class="status-badge status-着工前">着工前</span>
+    </div>
+  </div><div class="site-card" onclick="openSite(&#39;S-0008&#39;)">
+    <div class="card-photos"><div class="card-photo-empty">📷 写真なし</div></div>
+    <div class="card-body">
+      <div class="card-name">テスト様邸2</div>
+      <div class="card-meta">
+        <div class="card-meta-row">🏢 山本解体株式会社</div>
+        <div class="card-meta-row">📅 2026/04/25 〜 2026/04/30</div>
       </div>
       <span class="status-badge status-着工前">着工前</span>
     </div>
@@ -1124,7 +1134,7 @@ body {
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
   <div class="lightbox-img-wrap">
-    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_19.html" alt="">
+    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_11.html" alt="">
   </div>
   <button class="lightbox-nav prev" onclick="lightboxPrev()">‹</button>
   <button class="lightbox-nav next" onclick="lightboxNext()">›</button>
@@ -1217,13 +1227,21 @@ async function loadDashboard() {
     }
 
     grid.innerHTML = sites.map(s => buildSiteCard(s)).join('');
-    // 一覧カードの先頭1枚をGAS経由で非同期ロード（thumbnail_file_id優先）
+    // 一覧カードの先頭1枚：thumbnail_urlがあれば直接表示、なければGAS経由フォールバック
     sites.forEach(s => {
       if (s.thumbnails && s.thumbnails.length > 0) {
         const imgEl = document.getElementById(`card-thumb-${s.site_id}`);
         const thumb = s.thumbnails[0];
-        const fileId = thumb.thumbnail_file_id || thumb.file_id;
-        if (imgEl) loadPhotoImage(fileId, imgEl);
+        if (imgEl) {
+          if (thumb.thumbnail_url) {
+            // 公開URL直接表示（GAS経由不要・即時表示）
+            imgEl.src = thumb.thumbnail_url;
+          } else {
+            // 旧データ：GAS経由フォールバック
+            const fileId = thumb.thumbnail_file_id || thumb.file_id;
+            loadPhotoImage(fileId, imgEl);
+          }
+        }
       }
     });
   } catch (e) {
