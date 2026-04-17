@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_16.html -->
+<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_17.html -->
 <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -753,7 +753,7 @@ body {
 ============================================================ -->
 <header class="header">
   <div class="header-inner">
-    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_16.html#" onclick="showPage(&#39;dashboard&#39;)">
+    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_17.html#" onclick="showPage(&#39;dashboard&#39;)">
       <div class="logo-icon">K</div>
       <span class="logo-text">ココカラ<span>解体</span></span>
     </a>
@@ -840,7 +840,7 @@ body {
         
         <div class="card-meta-row">📅 2026/04/17 〜 2026/09/30</div>
       </div>
-      <span class="status-badge status-着工前">着工前</span>
+      <span class="status-badge status-工事中">工事中</span>
     </div>
   </div><div class="site-card" onclick="openSite(&#39;S-0006&#39;)">
     <div class="card-photos">
@@ -876,8 +876,8 @@ body {
   <div class="container">
     <div class="page-title">
       <div class="page-title-left">
-        <button class="back-btn" onclick="showPage(&#39;dashboard&#39;)">← 戻る</button>
-        <span>現場登録</span>
+        <button class="back-btn" id="site-form-back-btn" onclick="showPage(&#39;dashboard&#39;)">← 戻る</button>
+        <span id="site-form-title">現場登録</span>
       </div>
     </div>
     <div class="form-card">
@@ -920,8 +920,8 @@ body {
         </select>
       </div>
       <div class="form-actions">
-        <button class="btn btn-primary" onclick="submitCreateSite()">登録する</button>
-        <button class="btn btn-secondary" onclick="showPage(&#39;dashboard&#39;)">キャンセル</button>
+        <button class="btn btn-primary" id="site-form-submit-btn" onclick="submitCreateSite()">登録する</button>
+        <button class="btn btn-secondary" id="site-form-cancel-btn" onclick="showPage(&#39;dashboard&#39;)">キャンセル</button>
       </div>
     </div>
   </div>
@@ -937,7 +937,10 @@ body {
         <button class="back-btn" onclick="showPage(&#39;dashboard&#39;)">← 戻る</button>
         <span id="detail-title">現場詳細</span>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="showUpload()">📷 写真追加</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="showEditSite()">✏️ 編集</button>
+        <button class="btn btn-primary btn-sm" onclick="showUpload()">📷 写真追加</button>
+      </div>
     </div>
 
     <!-- 基本情報 -->
@@ -1044,8 +1047,8 @@ body {
   <div class="container">
     <div class="page-title">
       <div class="page-title-left">
-        <button class="back-btn" onclick="showPage(&#39;vendor-list&#39;)">← 戻る</button>
-        <span>業者登録</span>
+        <button class="back-btn" id="vendor-form-back-btn" onclick="showPage(&#39;vendor-list&#39;)">← 戻る</button>
+        <span id="vendor-form-title">業者登録</span>
       </div>
     </div>
     <div class="form-card">
@@ -1084,8 +1087,8 @@ body {
         </div>
       </div>
       <div class="form-actions">
-        <button class="btn btn-primary" onclick="submitCreateVendor()">登録する</button>
-        <button class="btn btn-secondary" onclick="showPage(&#39;vendor-list&#39;)">キャンセル</button>
+        <button class="btn btn-primary" id="vendor-form-submit-btn" onclick="submitCreateVendor()">登録する</button>
+        <button class="btn btn-secondary" id="vendor-form-cancel-btn" onclick="showPage(&#39;vendor-list&#39;)">キャンセル</button>
       </div>
     </div>
   </div>
@@ -1101,6 +1104,7 @@ body {
         <button class="back-btn" onclick="showPage(&#39;vendor-list&#39;)">← 戻る</button>
         <span id="vendor-detail-title">業者詳細</span>
       </div>
+      <button class="btn btn-secondary btn-sm" onclick="showEditVendor()">✏️ 編集</button>
     </div>
     <div class="detail-info-card">
       <div class="detail-info-grid" id="vendor-info-grid"></div>
@@ -1120,7 +1124,7 @@ body {
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
   <div class="lightbox-img-wrap">
-    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_16.html" alt="">
+    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_17.html" alt="">
   </div>
   <button class="lightbox-nav prev" onclick="lightboxPrev()">‹</button>
   <button class="lightbox-nav next" onclick="lightboxNext()">›</button>
@@ -1264,7 +1268,7 @@ function getDriveThumb(fileId) {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
 }
 
-async function loadPhotoImage(fileId, imgEl) {
+async function _fetchPhotoImage(fileId, imgEl) {
   if (!fileId) return;
   try {
     const url = new URL(GAS_URL);
@@ -1276,12 +1280,25 @@ async function loadPhotoImage(fileId, imgEl) {
       const mime = data.mimeType || 'image/jpeg';
       imgEl.src = `data:${mime};base64,${data.data}`;
     } else {
-      imgEl.src = '';
       imgEl.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div>';
     }
   } catch(e) {
     imgEl.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div>';
   }
+}
+
+function loadPhotoImage(fileId, imgEl) {
+  if (!fileId || !imgEl) return;
+  // Intersection Observer で画面内に入ったときだけ取得
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        obs.disconnect();
+        _fetchPhotoImage(fileId, imgEl);
+      }
+    });
+  }, { rootMargin: '100px' });
+  observer.observe(imgEl);
 }
 
 function getDriveView(fileId) {
@@ -1309,6 +1326,7 @@ async function loadSiteDetail(siteId) {
     if (!siteRes.success) { showToast('現場情報の取得に失敗しました', 'error'); return; }
 
     const site = siteRes.data;
+    _editingSiteData = site; // 編集用に保持
     document.getElementById('detail-title').textContent = site.site_name;
 
     // ステータスバッジ
@@ -1476,6 +1494,76 @@ async function submitCreateSite() {
       showPage('dashboard');
     } else {
       showToast('登録に失敗しました: ' + res.error, 'error');
+    }
+  } catch (e) {
+    hideLoading();
+    showToast('通信エラーが発生しました', 'error');
+  }
+}
+
+// ============================================================
+// 現場編集
+// ============================================================
+let _editingSiteData = null;
+
+function showEditSite() {
+  const s = _editingSiteData;
+  if (!s) return;
+  // タイトル・ボタン・戻る先を編集モードに切替
+  document.getElementById('site-form-title').textContent = '現場編集';
+  document.getElementById('site-form-submit-btn').textContent = '更新する';
+  document.getElementById('site-form-submit-btn').onclick = submitEditSite;
+  document.getElementById('site-form-back-btn').onclick = () => showPage('site-detail');
+  document.getElementById('site-form-cancel-btn').onclick = () => showPage('site-detail');
+  // フォームに現在値をセット
+  document.getElementById('site-name').value = s.site_name || '';
+  document.getElementById('site-address').value = s.address || '';
+  document.getElementById('site-phone').value = s.phone || '';
+  document.getElementById('site-period-start').value = (s.period_start || '').substring(0, 10);
+  document.getElementById('site-period-end').value = (s.period_end || '').substring(0, 10);
+  document.getElementById('site-status').value = s.status || '着工前';
+  // 業者セレクトをロードしてから値をセット
+  loadVendorSelectOptions().then(() => {
+    const sel = document.getElementById('site-vendor-select');
+    for (let opt of sel.options) {
+      if (opt.dataset.code === String(s.vendor_id)) { opt.selected = true; break; }
+    }
+    document.getElementById('site-vendor-id').value = s.vendor_id || '';
+    document.getElementById('site-vendor-name').value = s.vendor_name || '';
+  });
+  showPage('site-create');
+}
+
+async function submitEditSite() {
+  const name = document.getElementById('site-name').value.trim();
+  if (!name) { showToast('現場名は必須です', 'error'); return; }
+  showLoading();
+  try {
+    const res = await apiPost({
+      action: 'updateSite',
+      site_id: _editingSiteData.site_id,
+      site_name: name,
+      address: document.getElementById('site-address').value.trim(),
+      phone: document.getElementById('site-phone').value.trim(),
+      period_start: document.getElementById('site-period-start').value,
+      period_end: document.getElementById('site-period-end').value,
+      vendor_id: document.getElementById('site-vendor-id').value,
+      vendor_name: document.getElementById('site-vendor-name').value,
+      status: document.getElementById('site-status').value,
+    });
+    hideLoading();
+    if (res.success) {
+      showToast('現場情報を更新しました', 'success');
+      // フォームを新規登録モードに戻す
+      document.getElementById('site-form-title').textContent = '現場登録';
+      document.getElementById('site-form-submit-btn').textContent = '登録する';
+      document.getElementById('site-form-submit-btn').onclick = submitCreateSite;
+      document.getElementById('site-form-back-btn').onclick = () => showPage('dashboard');
+      document.getElementById('site-form-cancel-btn').onclick = () => showPage('dashboard');
+      showPage('site-detail');
+      loadSiteDetail(currentSiteId);
+    } else {
+      showToast('更新に失敗しました: ' + res.error, 'error');
     }
   } catch (e) {
     hideLoading();
@@ -1728,6 +1816,7 @@ async function loadVendorDetail(vendorId) {
     if (!res.success) return;
     const vendor = (res.data || []).find(v => v.vendor_id === vendorId);
     if (!vendor) { showToast('業者が見つかりません', 'error'); return; }
+    _editingVendorData = vendor; // 編集用に保持
     document.getElementById('vendor-detail-title').textContent = vendor.vendor_name || '業者詳細';
     document.getElementById('vendor-info-grid').innerHTML = `
       <div class="detail-info-item"><label>会社ID（4桁）</label><span>${vendor.company_code || '—'}</span></div>
@@ -1770,6 +1859,66 @@ async function submitCreateVendor() {
       showPage('vendor-list');
     } else {
       showToast('登録に失敗しました: ' + res.error, 'error');
+    }
+  } catch (e) {
+    hideLoading();
+    showToast('通信エラーが発生しました', 'error');
+  }
+}
+
+// ============================================================
+// 業者編集
+// ============================================================
+let _editingVendorData = null;
+
+function showEditVendor() {
+  const v = _editingVendorData;
+  if (!v) return;
+  document.getElementById('vendor-form-title').textContent = '業者編集';
+  document.getElementById('vendor-form-submit-btn').textContent = '更新する';
+  document.getElementById('vendor-form-submit-btn').onclick = submitEditVendor;
+  document.getElementById('vendor-form-back-btn').onclick = () => showPage('vendor-detail');
+  document.getElementById('vendor-form-cancel-btn').onclick = () => showPage('vendor-detail');
+  document.getElementById('v-company-code').value = v.company_code || '';
+  document.getElementById('v-vendor-name').value = v.vendor_name || '';
+  document.getElementById('v-address').value = v.address || '';
+  document.getElementById('v-representative').value = v.representative || '';
+  document.getElementById('v-company-phone').value = v.company_phone || '';
+  document.getElementById('v-mobile-phone').value = v.mobile_phone || '';
+  document.getElementById('v-email').value = v.email || '';
+  showPage('vendor-create');
+}
+
+async function submitEditVendor() {
+  const code = document.getElementById('v-company-code').value.trim();
+  const name = document.getElementById('v-vendor-name').value.trim();
+  if (!code || code.length !== 4) { showToast('会社IDは4桁で入力してください', 'error'); return; }
+  if (!name) { showToast('業者名は必須です', 'error'); return; }
+  showLoading();
+  try {
+    const res = await apiPost({
+      action: 'updateVendor',
+      vendor_id: _editingVendorData.vendor_id,
+      company_code: code,
+      vendor_name: name,
+      address: document.getElementById('v-address').value.trim(),
+      representative: document.getElementById('v-representative').value.trim(),
+      company_phone: document.getElementById('v-company-phone').value.trim(),
+      mobile_phone: document.getElementById('v-mobile-phone').value.trim(),
+      email: document.getElementById('v-email').value.trim(),
+    });
+    hideLoading();
+    if (res.success) {
+      showToast('業者情報を更新しました', 'success');
+      document.getElementById('vendor-form-title').textContent = '業者登録';
+      document.getElementById('vendor-form-submit-btn').textContent = '登録する';
+      document.getElementById('vendor-form-submit-btn').onclick = submitCreateVendor;
+      document.getElementById('vendor-form-back-btn').onclick = () => showPage('vendor-list');
+      document.getElementById('vendor-form-cancel-btn').onclick = () => showPage('vendor-list');
+      showPage('vendor-detail');
+      loadVendorDetail(currentVendorId);
+    } else {
+      showToast('更新に失敗しました: ' + res.error, 'error');
     }
   } catch (e) {
     hideLoading();
