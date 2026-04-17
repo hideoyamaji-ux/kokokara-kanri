@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_11.html -->
+<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_13.html -->
 <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -753,7 +753,7 @@ body {
 ============================================================ -->
 <header class="header">
   <div class="header-inner">
-    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_11.html#" onclick="showPage(&#39;dashboard&#39;)">
+    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_13.html#" onclick="showPage(&#39;dashboard&#39;)">
       <div class="logo-icon">K</div>
       <span class="logo-text">ココカラ<span>解体</span></span>
     </a>
@@ -1134,7 +1134,7 @@ body {
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
   <div class="lightbox-img-wrap">
-    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_11.html" alt="">
+    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_13.html" alt="">
   </div>
   <button class="lightbox-nav prev" onclick="lightboxPrev()">‹</button>
   <button class="lightbox-nav next" onclick="lightboxNext()">›</button>
@@ -1668,7 +1668,7 @@ async function submitUpload() {
     try {
       const base64 = await fileToBase64(file);
       const takenAt = await getExifDate(file);
-      const thumbBase64 = await resizeToThumbnail(file, 400);
+      const thumbBase64 = await resizeToThumbnail(file, 200);
 
       const res = await apiPost({
         action: 'uploadPhoto',
@@ -1716,7 +1716,7 @@ function resizeToThumbnail(file, maxWidth) {
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       // base64（data:image/jpeg;base64,xxx の xxx部分のみ）
-      resolve(canvas.toDataURL('image/jpeg', 0.7).split(',')[1]);
+      resolve(canvas.toDataURL('image/jpeg', 0.5).split(',')[1]);
     };
     img.onerror = () => { URL.revokeObjectURL(url); resolve(''); };
     img.src = url;
