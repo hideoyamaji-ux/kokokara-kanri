@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_17.html -->
+<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_19.html -->
 <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -753,7 +753,7 @@ body {
 ============================================================ -->
 <header class="header">
   <div class="header-inner">
-    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_17.html#" onclick="showPage(&#39;dashboard&#39;)">
+    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_19.html#" onclick="showPage(&#39;dashboard&#39;)">
       <div class="logo-icon">K</div>
       <span class="logo-text">ココカラ<span>解体</span></span>
     </a>
@@ -850,8 +850,8 @@ body {
     <div class="card-body">
       <div class="card-name">テスト邸解体工事</div>
       <div class="card-meta">
-        <div class="card-meta-row">🏢 ココカラ解体</div>
-        <div class="card-meta-row">📅 2026/04/18 〜 2026/04/30</div>
+        <div class="card-meta-row">🏢 テスト業者（更新確認）</div>
+        <div class="card-meta-row">📅 2026/04/17 〜 2026/04/29</div>
       </div>
       <span class="status-badge status-着工前">着工前</span>
     </div>
@@ -1124,7 +1124,7 @@ body {
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
   <div class="lightbox-img-wrap">
-    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_17.html" alt="">
+    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_19.html" alt="">
   </div>
   <button class="lightbox-nav prev" onclick="lightboxPrev()">‹</button>
   <button class="lightbox-nav next" onclick="lightboxNext()">›</button>
@@ -1217,11 +1217,13 @@ async function loadDashboard() {
     }
 
     grid.innerHTML = sites.map(s => buildSiteCard(s)).join('');
-    // 一覧カードの先頭1枚をGAS経由で非同期ロード
+    // 一覧カードの先頭1枚をGAS経由で非同期ロード（thumbnail_file_id優先）
     sites.forEach(s => {
       if (s.thumbnails && s.thumbnails.length > 0) {
         const imgEl = document.getElementById(`card-thumb-${s.site_id}`);
-        if (imgEl) loadPhotoImage(s.thumbnails[0].file_id, imgEl);
+        const thumb = s.thumbnails[0];
+        const fileId = thumb.thumbnail_file_id || thumb.file_id;
+        if (imgEl) loadPhotoImage(fileId, imgEl);
       }
     });
   } catch (e) {
@@ -1236,8 +1238,10 @@ function buildSiteCard(site) {
   if (thumbs.length === 0) {
     photoSection = `<div class="card-photos"><div class="card-photo-empty">📷 写真なし</div></div>`;
   } else {
-    // 先頭1枚のみGAS経由で表示（複数枚同時取得は行わない）
+    // 先頭1枚：thumbnail_file_id があればサムネイル、なければ元画像（フォールバック）
+    const thumb = thumbs[0];
     const cardId = `card-thumb-${site.site_id}`;
+    const thumbFileId = thumb.thumbnail_file_id || thumb.file_id;
     photoSection = `<div class="card-photos">
       <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;">
         <img id="${cardId}" alt="" style="width:100%;height:100%;object-fit:cover;">
@@ -1646,6 +1650,7 @@ async function submitUpload() {
     try {
       const base64 = await fileToBase64(file);
       const takenAt = await getExifDate(file);
+      const thumbBase64 = await resizeToThumbnail(file, 400);
 
       const res = await apiPost({
         action: 'uploadPhoto',
@@ -1657,6 +1662,7 @@ async function submitUpload() {
         vendor_id: '',
         vendor_name: '',
         taken_at: takenAt,
+        thumbnail_data: thumbBase64,
       });
 
       if (res.success) successCount++;
@@ -1675,6 +1681,28 @@ async function submitUpload() {
   } else {
     showToast('アップロードに失敗しました', 'error');
   }
+}
+
+// Canvas APIで画像を縮小してbase64を返す
+function resizeToThumbnail(file, maxWidth) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxWidth / img.width);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      // base64（data:image/jpeg;base64,xxx の xxx部分のみ）
+      resolve(canvas.toDataURL('image/jpeg', 0.7).split(',')[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(''); };
+    img.src = url;
+  });
 }
 
 function fileToBase64(file) {
