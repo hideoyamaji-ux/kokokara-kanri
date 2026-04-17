@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_14.html -->
+<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_15.html -->
 <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -753,7 +753,7 @@ body {
 ============================================================ -->
 <header class="header">
   <div class="header-inner">
-    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_14.html#" onclick="showPage(&#39;dashboard&#39;)">
+    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_15.html#" onclick="showPage(&#39;dashboard&#39;)">
       <div class="logo-icon">K</div>
       <span class="logo-text">ココカラ<span>解体</span></span>
     </a>
@@ -802,7 +802,7 @@ body {
   </div><div class="site-card" onclick="openSite(&#39;S-0002&#39;)">
     <div class="card-photos">
       <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
-      <div class="photo-count-badge">📷 6枚</div>
+      <div class="photo-count-badge">📷 11枚</div>
     </div>
     <div class="card-body">
       <div class="card-name">trスト</div>
@@ -1134,7 +1134,7 @@ body {
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
   <div class="lightbox-img-wrap">
-    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_14.html" alt="">
+    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_15.html" alt="">
   </div>
   <button class="lightbox-nav prev" onclick="lightboxPrev()">‹</button>
   <button class="lightbox-nav next" onclick="lightboxNext()">›</button>
@@ -1784,7 +1784,16 @@ function closeLightbox() {
 
 function renderLightbox() {
   const p = currentPhotos[lightboxIndex];
-  document.getElementById('lightbox-img').src = p.thumbnail_link || getDriveThumb(p.file_id);
+  // detail_url（320px）→ thumbnail_url（160px）→ GAS経由フォールバック
+  const imgEl = document.getElementById('lightbox-img');
+  if (p.detail_url) {
+    imgEl.src = p.detail_url;
+  } else if (p.thumbnail_url) {
+    imgEl.src = p.thumbnail_url;
+  } else {
+    imgEl.src = '';
+    loadPhotoImage(p.file_id, imgEl);
+  }
   document.getElementById('lightbox-comment').textContent = p.comment || '';
   document.getElementById('lightbox-meta').textContent =
     [p.taken_at ? '撮影: ' + formatDate(p.taken_at) : '',
