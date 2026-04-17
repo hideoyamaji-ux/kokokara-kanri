@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_14.html -->
+<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_16.html -->
 <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -753,7 +753,7 @@ body {
 ============================================================ -->
 <header class="header">
   <div class="header-inner">
-    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_14.html#" onclick="showPage(&#39;dashboard&#39;)">
+    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_16.html#" onclick="showPage(&#39;dashboard&#39;)">
       <div class="logo-icon">K</div>
       <span class="logo-text">ココカラ<span>解体</span></span>
     </a>
@@ -784,11 +784,11 @@ body {
   <div class="container">
     <div class="dashboard-header">
       <h1 style="font-size:18px;font-weight:700;color:var(--gray-900)">現場一覧</h1>
-      <span class="site-count" id="site-count">5件</span>
+      <span class="site-count" id="site-count">7件</span>
     </div>
     <div class="cards-grid" id="cards-grid"><div class="site-card" onclick="openSite(&#39;S-0001&#39;)">
     <div class="card-photos">
-      <div class="card-photo-main"><img src="./ココカラ解体 現場管理_files/thumbnail" onerror="this.style.display=&#39;none&#39;" style="display: none;"></div><div class="card-photo-sub"><img src="./ココカラ解体 現場管理_files/thumbnail(1)" onerror="this.style.display=&#39;none&#39;" style="display: none;"></div><div class="card-photo-sub"><img src="./ココカラ解体 現場管理_files/thumbnail(2)" onerror="this.style.display=&#39;none&#39;" style="display: none;"></div>
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
       <div class="photo-count-badge">📷 3枚</div>
     </div>
     <div class="card-body">
@@ -801,7 +801,7 @@ body {
     </div>
   </div><div class="site-card" onclick="openSite(&#39;S-0002&#39;)">
     <div class="card-photos">
-      <div class="card-photo-main"><img src="./ココカラ解体 現場管理_files/thumbnail(3)" onerror="this.style.display=&#39;none&#39;" style="display: none;"></div><div class="card-photo-sub"><img src="./ココカラ解体 現場管理_files/thumbnail(4)" onerror="this.style.display=&#39;none&#39;" style="display: none;"></div><div class="card-photo-sub"><img src="./ココカラ解体 現場管理_files/thumbnail(5)" onerror="this.style.display=&#39;none&#39;" style="display: none;"></div>
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
       <div class="photo-count-badge">📷 5枚</div>
     </div>
     <div class="card-body">
@@ -839,6 +839,29 @@ body {
       <div class="card-meta">
         
         <div class="card-meta-row">📅 2026/04/17 〜 2026/09/30</div>
+      </div>
+      <span class="status-badge status-着工前">着工前</span>
+    </div>
+  </div><div class="site-card" onclick="openSite(&#39;S-0006&#39;)">
+    <div class="card-photos">
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
+      <div class="photo-count-badge">📷 4枚</div>
+    </div>
+    <div class="card-body">
+      <div class="card-name">テスト邸解体工事</div>
+      <div class="card-meta">
+        <div class="card-meta-row">🏢 ココカラ解体</div>
+        <div class="card-meta-row">📅 2026/04/18 〜 2026/04/30</div>
+      </div>
+      <span class="status-badge status-着工前">着工前</span>
+    </div>
+  </div><div class="site-card" onclick="openSite(&#39;S-0007&#39;)">
+    <div class="card-photos"><div class="card-photo-empty">📷 写真なし</div></div>
+    <div class="card-body">
+      <div class="card-name">テスト様邸解体工事</div>
+      <div class="card-meta">
+        <div class="card-meta-row">🏢 山本解体株式会社</div>
+        <div class="card-meta-row">📅 2026/04/18 〜 2026/04/30</div>
       </div>
       <span class="status-badge status-着工前">着工前</span>
     </div>
@@ -1097,7 +1120,7 @@ body {
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
   <div class="lightbox-img-wrap">
-    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_14.html" alt="">
+    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_16.html" alt="">
   </div>
   <button class="lightbox-nav prev" onclick="lightboxPrev()">‹</button>
   <button class="lightbox-nav next" onclick="lightboxNext()">›</button>
@@ -1190,6 +1213,13 @@ async function loadDashboard() {
     }
 
     grid.innerHTML = sites.map(s => buildSiteCard(s)).join('');
+    // 一覧カードの先頭1枚をGAS経由で非同期ロード
+    sites.forEach(s => {
+      if (s.thumbnails && s.thumbnails.length > 0) {
+        const imgEl = document.getElementById(`card-thumb-${s.site_id}`);
+        if (imgEl) loadPhotoImage(s.thumbnails[0].file_id, imgEl);
+      }
+    });
   } catch (e) {
     hideLoading();
     showToast('通信エラーが発生しました', 'error');
@@ -1202,11 +1232,12 @@ function buildSiteCard(site) {
   if (thumbs.length === 0) {
     photoSection = `<div class="card-photos"><div class="card-photo-empty">📷 写真なし</div></div>`;
   } else {
-    const main = thumbs[0] ? `<div class="card-photo-main"><img src="${thumbs[0].thumbnail_link || getDriveThumb(thumbs[0].file_id)}" onerror="this.style.display='none'"></div>` : '';
-    const sub1 = thumbs[1] ? `<div class="card-photo-sub"><img src="${thumbs[1].thumbnail_link || getDriveThumb(thumbs[1].file_id)}" onerror="this.style.display='none'"></div>` : '<div class="card-photo-sub"></div>';
-    const sub2 = thumbs[2] ? `<div class="card-photo-sub"><img src="${thumbs[2].thumbnail_link || getDriveThumb(thumbs[2].file_id)}" onerror="this.style.display='none'"></div>` : '<div class="card-photo-sub"></div>';
+    // 先頭1枚のみGAS経由で表示（複数枚同時取得は行わない）
+    const cardId = `card-thumb-${site.site_id}`;
     photoSection = `<div class="card-photos">
-      ${main}${sub1}${sub2}
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;">
+        <img id="${cardId}" alt="" style="width:100%;height:100%;object-fit:cover;">
+      </div>
       ${site.total_photos > 0 ? `<div class="photo-count-badge">📷 ${site.total_photos}枚</div>` : ''}
     </div>`;
   }
@@ -1231,6 +1262,26 @@ function buildSiteCard(site) {
 function getDriveThumb(fileId) {
   // thumbnail APIを使用（Googleアカウントでログイン済みの場合に表示）
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+}
+
+async function loadPhotoImage(fileId, imgEl) {
+  if (!fileId) return;
+  try {
+    const url = new URL(GAS_URL);
+    url.searchParams.set('action', 'getPhotoImage');
+    url.searchParams.set('file_id', fileId);
+    const res = await fetch(url.toString());
+    const data = await res.json();
+    if (data.success && data.data) {
+      const mime = data.mimeType || 'image/jpeg';
+      imgEl.src = `data:${mime};base64,${data.data}`;
+    } else {
+      imgEl.src = '';
+      imgEl.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div>';
+    }
+  } catch(e) {
+    imgEl.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div>';
+  }
 }
 
 function getDriveView(fileId) {
@@ -1306,9 +1357,8 @@ function renderPhotos(photos) {
   grid.innerHTML = photos.map((p, i) => `
     <div class="photo-item" onclick="openLightbox(${i})">
       <div class="photo-thumb-wrap" style="width:100%;aspect-ratio:4/3;background:var(--gray-100);overflow:hidden;position:relative;">
-        <img class="photo-thumb" src="${p.thumbnail_link || getDriveThumb(p.file_id)}" alt=""
-          style="width:100%;height:100%;object-fit:cover;display:block;"
-          onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;\'>📷</div>'">
+        <img class="photo-thumb" id="photo-img-${i}" alt=""
+          style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
       <div class="photo-info">
         <div class="photo-date">${formatDate(p.created_at)}</div>
@@ -1316,6 +1366,11 @@ function renderPhotos(photos) {
       </div>
     </div>
   `).join('');
+  // GAS経由で画像を非同期ロード
+  photos.forEach((p, i) => {
+    const imgEl = document.getElementById(`photo-img-${i}`);
+    if (imgEl && p.file_id) loadPhotoImage(p.file_id, imgEl);
+  });
 }
 
 async function changeStatus(status) {
