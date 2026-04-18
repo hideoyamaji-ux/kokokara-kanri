@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_18.html -->
+<!-- saved from url=(0055)file:///C:/Users/PCUSER/Desktop/Downloads/index_22.html -->
 <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -753,7 +753,7 @@ body {
 ============================================================ -->
 <header class="header">
   <div class="header-inner">
-    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_18.html#" onclick="showPage(&#39;dashboard&#39;)">
+    <a class="logo" href="file:///C:/Users/PCUSER/Desktop/Downloads/index_22.html#" onclick="showPage(&#39;dashboard&#39;)">
       <div class="logo-icon">K</div>
       <span class="logo-text">ココカラ<span>解体</span></span>
     </a>
@@ -788,7 +788,9 @@ body {
     </div>
     <div class="cards-grid" id="cards-grid"><div class="site-card" onclick="openSite(&#39;S-0001&#39;)">
     <div class="card-photos">
-      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;">
+        <img id="card-thumb-S-0001" alt="" style="width:100%;height:100%;object-fit:cover;" src="./ココカラ解体 現場管理_files/uc">
+      </div>
       <div class="photo-count-badge">📷 3枚</div>
     </div>
     <div class="card-body">
@@ -801,7 +803,9 @@ body {
     </div>
   </div><div class="site-card" onclick="openSite(&#39;S-0002&#39;)">
     <div class="card-photos">
-      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;">
+        <img id="card-thumb-S-0002" alt="" style="width:100%;height:100%;object-fit:cover;" src="./ココカラ解体 現場管理_files/uc(1)">
+      </div>
       <div class="photo-count-badge">📷 11枚</div>
     </div>
     <div class="card-body">
@@ -844,7 +848,9 @@ body {
     </div>
   </div><div class="site-card" onclick="openSite(&#39;S-0006&#39;)">
     <div class="card-photos">
-      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;">
+        <img id="card-thumb-S-0006" alt="" style="width:100%;height:100%;object-fit:cover;" src="./ココカラ解体 現場管理_files/uc(2)">
+      </div>
       <div class="photo-count-badge">📷 7枚</div>
     </div>
     <div class="card-body">
@@ -877,7 +883,9 @@ body {
     </div>
   </div><div class="site-card" onclick="openSite(&#39;S-0009&#39;)">
     <div class="card-photos">
-      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;">
+        <img id="card-thumb-S-0009" alt="" style="width:100%;height:100%;object-fit:cover;" src="./ココカラ解体 現場管理_files/uc(3)">
+      </div>
       <div class="photo-count-badge">📷 5枚</div>
     </div>
     <div class="card-body">
@@ -890,7 +898,9 @@ body {
     </div>
   </div><div class="site-card" onclick="openSite(&#39;S-0010&#39;)">
     <div class="card-photos">
-      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--gray-400);font-size:24px;">📷</div></div>
+      <div class="card-photo-main" style="grid-column:1/-1;grid-row:1/-1;">
+        <img id="card-thumb-S-0010" alt="" style="width:100%;height:100%;object-fit:cover;" src="./ココカラ解体 現場管理_files/uc(4)">
+      </div>
       <div class="photo-count-badge">📷 2枚</div>
     </div>
     <div class="card-body">
@@ -1160,7 +1170,7 @@ body {
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
   <div class="lightbox-img-wrap">
-    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_18.html" alt="">
+    <img class="lightbox-img" id="lightbox-img" src="file:///C:/Users/PCUSER/Desktop/Downloads/index_22.html" alt="">
   </div>
   <button class="lightbox-nav prev" onclick="lightboxPrev()">‹</button>
   <button class="lightbox-nav next" onclick="lightboxNext()">›</button>
@@ -1189,7 +1199,22 @@ const _cache = {
   sitePhotos: {},
   ttl: { sites: 0, vendors: 0 }
 };
-const CACHE_TTL = 60 * 1000;
+const SITE_CACHE_TTL = 60 * 1000;
+const VENDOR_CACHE_TTL = 120 * 1000;
+
+function invalidateSitesCache(siteId = null) {
+  _cache.sites = null;
+  _cache.ttl.sites = 0;
+  if (siteId) {
+    delete _cache.siteDetails[siteId];
+    delete _cache.sitePhotos[siteId];
+  }
+}
+
+function invalidateVendorsCache() {
+  _cache.vendors = null;
+  _cache.ttl.vendors = 0;
+}
 let lightboxIndex = 0;
 let selectedFiles = [];
 
@@ -1242,8 +1267,8 @@ function showToast(msg, type = '') {
 // ============================================================
 // ダッシュボード
 // ============================================================
-async function loadDashboard() {
-  if (_cache.sites && Date.now() < _cache.ttl.sites) {
+async function loadDashboard(force = false) {
+  if (!force && _cache.sites && Date.now() < _cache.ttl.sites) {
     renderSites(_cache.sites);
     return;
   }
@@ -1253,7 +1278,7 @@ async function loadDashboard() {
     hideLoading();
     if (!res.success) { showToast('現場の取得に失敗しました', 'error'); return; }
     _cache.sites = res.data || [];
-    _cache.ttl.sites = Date.now() + CACHE_TTL;
+    _cache.ttl.sites = Date.now() + SITE_CACHE_TTL;
     renderSites(_cache.sites);
   } catch (e) {
     hideLoading();
@@ -1375,8 +1400,8 @@ function openSite(siteId) {
 // ============================================================
 // 現場詳細
 // ============================================================
-async function loadSiteDetail(siteId) {
-  if (_cache.siteDetails[siteId] && _cache.sitePhotos[siteId]) {
+async function loadSiteDetail(siteId, force = false) {
+  if (!force && _cache.siteDetails[siteId] && _cache.sitePhotos[siteId]) {
     renderSiteDetail(_cache.siteDetails[siteId], _cache.sitePhotos[siteId]);
     return;
   }
@@ -1463,9 +1488,7 @@ async function changeStatus(status) {
     hideLoading();
     if (res.success) {
       showToast('ステータスを更新しました', 'success');
-      _cache.sites = null;
-      delete _cache.siteDetails[currentSiteId];
-      delete _cache.sitePhotos[currentSiteId];
+      invalidateSitesCache(currentSiteId);
       loadSiteDetail(currentSiteId);
     } else {
       showToast('更新に失敗しました', 'error');
@@ -1484,9 +1507,7 @@ async function confirmDeleteSite() {
     hideLoading();
     if (res.success) {
       showToast('現場を削除しました', 'success');
-      _cache.sites = null;
-      delete _cache.siteDetails[currentSiteId];
-      delete _cache.sitePhotos[currentSiteId];
+      invalidateSitesCache(currentSiteId);
       showPage('dashboard');
     } else {
       showToast('削除に失敗しました', 'error');
@@ -1500,13 +1521,13 @@ async function confirmDeleteSite() {
 // ============================================================
 // 現場登録フォーム用 業者セレクト
 // ============================================================
-async function loadVendorSelectOptions() {
-  if (!_cache.vendors || Date.now() >= _cache.ttl.vendors) {
+async function loadVendorSelectOptions(force = false) {
+  if (force || !_cache.vendors || Date.now() >= _cache.ttl.vendors) {
     try {
       const res = await apiGet({ action: 'getVendors' });
       if (!res.success) return;
       _cache.vendors = res.data || [];
-      _cache.ttl.vendors = Date.now() + CACHE_TTL;
+      _cache.ttl.vendors = Date.now() + VENDOR_CACHE_TTL;
     } catch (e) { return; }
   }
   buildVendorSelect(_cache.vendors);
@@ -1562,7 +1583,7 @@ async function submitCreateSite() {
     hideLoading();
     if (res.success) {
       showToast('現場を登録しました', 'success');
-      _cache.sites = null; // 一覧キャッシュクリア
+      invalidateSitesCache();
       // フォームリセット
       ['site-name','site-address','site-phone','site-period-start','site-period-end'].forEach(id => {
         document.getElementById(id).value = '';
@@ -1633,9 +1654,7 @@ async function submitEditSite() {
     hideLoading();
     if (res.success) {
       showToast('現場情報を更新しました', 'success');
-      _cache.sites = null;
-      delete _cache.siteDetails[currentSiteId];
-      delete _cache.sitePhotos[currentSiteId];
+      invalidateSitesCache(currentSiteId);
       // フォームを新規登録モードに戻す
       document.getElementById('site-form-title').textContent = '現場登録';
       document.getElementById('site-form-submit-btn').textContent = '登録する';
@@ -1643,7 +1662,7 @@ async function submitEditSite() {
       document.getElementById('site-form-back-btn').onclick = () => showPage('dashboard');
       document.getElementById('site-form-cancel-btn').onclick = () => showPage('dashboard');
       showPage('site-detail');
-      loadSiteDetail(currentSiteId);
+      // showPage内でloadSiteDetail(currentSiteId)が呼ばれるため重複呼び出しを削除
     } else {
       showToast('更新に失敗しました: ' + res.error, 'error');
     }
@@ -1756,9 +1775,7 @@ async function submitUpload() {
   btn.textContent = 'アップロード';
 
   if (successCount > 0) {
-    _cache.sites = null;
-    delete _cache.siteDetails[currentSiteId];
-    delete _cache.sitePhotos[currentSiteId];
+    invalidateSitesCache(currentSiteId);
     showToast(`${successCount}枚アップロードしました`, 'success');
     showPage('site-detail');
   } else {
@@ -1889,8 +1906,8 @@ function formatDate(dateStr) {
 // ============================================================
 let currentVendorId = null;
 
-async function loadVendorList() {
-  if (_cache.vendors && Date.now() < _cache.ttl.vendors) {
+async function loadVendorList(force = false) {
+  if (!force && _cache.vendors && Date.now() < _cache.ttl.vendors) {
     renderVendorList(_cache.vendors);
     return;
   }
@@ -1900,7 +1917,7 @@ async function loadVendorList() {
     hideLoading();
     if (!res.success) { showToast('業者の取得に失敗しました', 'error'); return; }
     _cache.vendors = res.data || [];
-    _cache.ttl.vendors = Date.now() + CACHE_TTL;
+    _cache.ttl.vendors = Date.now() + VENDOR_CACHE_TTL;
     renderVendorList(_cache.vendors);
   } catch (e) {
     hideLoading();
@@ -1937,15 +1954,15 @@ function openVendor(vendorId) {
   showPage('vendor-detail');
 }
 
-async function loadVendorDetail(vendorId) {
-  if (!_cache.vendors || Date.now() >= _cache.ttl.vendors) {
+async function loadVendorDetail(vendorId, force = false) {
+  if (force || !_cache.vendors || Date.now() >= _cache.ttl.vendors) {
     showLoading();
     try {
       const res = await apiGet({ action: 'getVendors' });
       hideLoading();
       if (!res.success) return;
       _cache.vendors = res.data || [];
-      _cache.ttl.vendors = Date.now() + CACHE_TTL;
+      _cache.ttl.vendors = Date.now() + VENDOR_CACHE_TTL;
     } catch (e) { hideLoading(); return; }
   }
   const vendor = _cache.vendors.find(v => String(v.vendor_id) === String(vendorId));
@@ -1987,7 +2004,7 @@ async function submitCreateVendor() {
     hideLoading();
     if (res.success) {
       showToast('業者を登録しました', 'success');
-      _cache.vendors = null;
+      invalidateVendorsCache();
       ['v-company-code','v-vendor-name','v-address','v-representative','v-company-phone','v-mobile-phone','v-email'].forEach(id => {
         document.getElementById(id).value = '';
       });
@@ -2045,14 +2062,14 @@ async function submitEditVendor() {
     hideLoading();
     if (res.success) {
       showToast('業者情報を更新しました', 'success');
-      _cache.vendors = null;
+      invalidateVendorsCache();
       document.getElementById('vendor-form-title').textContent = '業者登録';
       document.getElementById('vendor-form-submit-btn').textContent = '登録する';
       document.getElementById('vendor-form-submit-btn').onclick = submitCreateVendor;
       document.getElementById('vendor-form-back-btn').onclick = () => showPage('vendor-list');
       document.getElementById('vendor-form-cancel-btn').onclick = () => showPage('vendor-list');
       showPage('vendor-detail');
-      loadVendorDetail(currentVendorId);
+      // showPage内でloadVendorDetail(currentVendorId)が呼ばれるため重複呼び出しを削除
     } else {
       showToast('更新に失敗しました: ' + res.error, 'error');
     }
@@ -2070,7 +2087,7 @@ async function confirmDeleteVendor() {
     hideLoading();
     if (res.success) {
       showToast('業者を削除しました', 'success');
-      _cache.vendors = null;
+      invalidateVendorsCache();
       showPage('vendor-list');
     } else {
       showToast('削除に失敗しました', 'error');
